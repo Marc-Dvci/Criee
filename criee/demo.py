@@ -41,7 +41,7 @@ WISH_MIX = [
     (Category.PREPARED_MEAL, "vegetarian dinner", 350, 800, [Attr.VEGETARIAN], 0.15),
     (Category.GROCERY_BOX, "vegetable box", 1800, 2600, [], 0.0),
 ]
-EVENING = WeeklyWindow(days=tuple(Weekday), start_min=6 * 60, end_min=23 * 60 + 59)
+EVENING = WeeklyWindow(days=tuple(Weekday), start_min=0, end_min=1440)
 
 
 def _rng(tag: str) -> random.Random:

@@ -278,3 +278,5 @@ textarea.input { resize: vertical; min-height: 92px; line-height: 1.45; }
   .nav::-webkit-scrollbar { display: none; }
   .status-pill .chip { display: none; }
 }
+.ag-cell .chip { line-height: 1.35; vertical-align: middle; }
+.ag-cell { display: flex; align-items: center; }

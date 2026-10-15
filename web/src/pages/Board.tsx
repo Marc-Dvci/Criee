@@ -30,7 +30,7 @@ function NextCell({ l, now }: { l: Lot; now: number }) {
     const pct = Math.min(100, (100 * l.threshold.committed) / l.threshold.target)
     return (
       <div className="stack tight" style={{ minWidth: 150 }}>
-        <div className="row between small"><span className="mono">{l.threshold.committed} / {l.threshold.target}</span>
+        <div className="row between small"><span className="mono">{Math.min(l.threshold.committed, l.threshold.target)} / {l.threshold.target}{l.threshold.committed > l.threshold.target ? ` +${l.threshold.committed - l.threshold.target} waitlist` : ''}</span>
           <span className="muted">{countdown(l.closes_at, now)}</span></div>
         <div className="progress"><i style={{ width: `${pct}%` }} /></div>
         {l.threshold.burst && <span className="tiny" style={{ color: 'var(--sold)' }}>{l.threshold.burst.authorized} PayPal holds in {(l.threshold.burst.wall_ms / 1000).toFixed(1)} s</span>}
@@ -101,7 +101,7 @@ export default function Board() {
                 <td><div className="board-name">{l.name_fr || l.name}<small>{l.name_fr ? `${l.name} · ` : ''}{l.shop.name}{l.simulated ? ' · simulated' : ''}</small></div></td>
                 <td className="hide-sm"><div className="small">{MODE[l.mode].fr}<div className="muted tiny">{MODE[l.mode].en}</div></div></td>
                 <td><PriceFlap cents={l.price} tone={cls === 'sold' ? 'amber' : undefined} /></td>
-                <td><Flap text={String(l.mode === 'threshold' ? l.quantity - (l.threshold?.committed ?? 0) : l.remaining).padStart(2, ' ').slice(-3)} tone={l.remaining === 0 ? 'dim' : undefined} label={`${l.remaining} left`} /></td>
+                <td><Flap text={String(Math.max(0, l.mode === 'threshold' ? l.quantity - (l.threshold?.committed ?? 0) : l.remaining)).padStart(2, ' ').slice(-3)} tone={l.remaining === 0 ? 'dim' : undefined} label={`${l.remaining} left`} /></td>
                 <td className="hide-sm mono">{l.waiting}</td>
                 <td className="hide-sm"><NextCell l={l} now={now} /></td>
                 <td><span className={`status-flap ${cls}`}>{fr}</span><div className="tiny muted" style={{ marginTop: 3 }}>{en}</div></td>

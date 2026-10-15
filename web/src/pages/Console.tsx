@@ -87,7 +87,7 @@ export default function Console({ session }: { session: Session }) {
     { field: 'paypal.authorization_id', headerName: 'PayPal authorization', width: 190, cellClass: 'mono' },
     { field: 'paypal.capture_id', headerName: 'PayPal capture', width: 180, cellClass: 'mono' },
     { field: 'paypal.refunded', headerName: 'Refunded', valueFormatter: money, width: 105 },
-    { field: 'simulated', headerName: 'Buyer', valueFormatter: (p) => (p.value ? 'simulated' : 'person'), width: 110 },
+    { field: 'simulated', headerName: 'Buyer', cellDataType: 'text', valueFormatter: (p) => (p.value ? 'simulated' : 'person'), width: 110 },
     { headerName: '', width: 190, sortable: false, filter: false, cellRenderer: (p: ICellRendererParams<Match>) => (
       <div className="row" style={{ height: '100%' }}>
         {p.data?.status === 'captured' && p.data.total > p.data.paypal.refunded && <button className="btn small" onClick={() => refund(p.data!)}>Refund</button>}
@@ -97,7 +97,7 @@ export default function Console({ session }: { session: Session }) {
 
   const payoutCols = useMemo<ColDef<Payout>[]>(() => [
     { field: 'at', headerName: 'Sent', valueFormatter: (p) => hhmm(p.value), width: 90, sort: 'desc' },
-    { field: 'match_ids', headerName: 'Sales', valueFormatter: (p) => String(p.value.length), width: 90 },
+    { field: 'match_ids', headerName: 'Sales', cellDataType: 'text', valueFormatter: (p) => String(p.value.length), width: 90 },
     { field: 'gross', valueFormatter: money, width: 110 },
     { field: 'fee', headerName: 'Criée fee', valueFormatter: money, width: 110 },
     { field: 'debit', headerName: 'Refund netting', valueFormatter: money, width: 140 },
@@ -125,10 +125,10 @@ export default function Console({ session }: { session: Session }) {
     { field: 'limit', headerName: 'Limit', valueFormatter: money, width: 100, sort: 'desc' },
     { field: 'units', width: 80 },
     { field: 'distance_band', headerName: 'Distance', width: 110 },
-    { field: 'conditions', valueFormatter: (p) => p.value.join(', ') || '–', flex: 1 },
-    { field: 'modes', valueFormatter: (p) => p.value.map((m: string) => MODE[m].en).join(', '), flex: 1 },
+    { field: 'conditions', cellDataType: 'text', valueFormatter: (p) => p.value.join(', ') || '–', flex: 1 },
+    { field: 'modes', cellDataType: 'text', valueFormatter: (p) => p.value.map((m: string) => MODE[m].en).join(', '), flex: 1 },
     { field: 'per_week', headerName: 'Per week', width: 100 },
-    { field: 'simulated', valueFormatter: (p) => (p.value ? 'simulated' : 'person'), width: 110 },
+    { field: 'simulated', headerName: 'Buyer', cellDataType: 'text', valueFormatter: (p) => (p.value ? 'simulated' : 'person'), width: 110 },
   ], [])
 
   const lotCols = useMemo<ColDef<Lot>[]>(() => [

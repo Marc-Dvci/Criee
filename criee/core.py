@@ -213,10 +213,12 @@ class Core:
         return s
 
     def vault_for(self, account_id: str) -> Optional[str]:
+        """The saved PayPal wallet to charge. "@demo" resolves to the current demo wallet at charge time."""
         acc = self.accounts.get(account_id)
-        if acc and acc.simulated:
-            return self.ledger.kv_get("vault:demo") or self.cfg.demo_vault_id
-        return self.ledger.kv_get(f"vault:{account_id}")
+        ref = self.ledger.kv_get(f"vault:{account_id}")
+        if (acc and acc.simulated) or ref == "@demo":
+            return self.cfg.demo_vault_id or self.ledger.kv_get("vault:demo")
+        return ref
 
     def payout_email_for(self, seller_id: str) -> Optional[str]:
         return self.ledger.kv_get(f"payout:{seller_id}") or self.cfg.seller_payout_email

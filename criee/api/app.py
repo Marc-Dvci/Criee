@@ -101,7 +101,7 @@ def build_core(cfg: Config) -> Core:
     paypal = PayPalClient(cfg.paypal_client_id, cfg.paypal_secret, cfg.currency) if cfg.paypal_live else FakePayPal()
     core = Core(cfg, paypal)
     core.ai = AI(cfg, core.ledger.kv_get, core.ledger.kv_set)
-    if cfg.demo_vault_id and not core.ledger.kv_get("vault:demo"):
+    if cfg.demo_vault_id:
         core.ledger.kv_set("vault:demo", cfg.demo_vault_id)
     return core
 
@@ -323,7 +323,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         demo = core.ledger.kv_get("vault:demo") or cfg.demo_vault_id
         if not demo:
             raise HTTPException(409, "no demo wallet configured")
-        core.ledger.kv_set(f"vault:{acc.id}", demo)
+        core.ledger.kv_set(f"vault:{acc.id}", "@demo")
         core.ledger.kv_set(f"vault_label:{acc.id}", "Demo PayPal wallet (sandbox)")
         core.emit("buyer.vaulted", {"account_id": acc.id, "method": "demo_wallet",
                                     "token_ref": hashlib.sha256(demo.encode()).hexdigest()[:12]})
@@ -618,7 +618,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
                 core.emit("account.role_added", {"account_id": acc.id, "role": r})
         if not acc.vaulted and (core.ledger.kv_get("vault:demo") or cfg.demo_vault_id):
             demo = core.ledger.kv_get("vault:demo") or cfg.demo_vault_id
-            core.ledger.kv_set(f"vault:{acc.id}", demo)
+            core.ledger.kv_set(f"vault:{acc.id}", "@demo")
             core.ledger.kv_set(f"vault_label:{acc.id}", "Demo PayPal wallet (sandbox)")
             core.emit("buyer.vaulted", {"account_id": acc.id, "method": "demo_wallet",
                                         "token_ref": hashlib.sha256(demo.encode()).hexdigest()[:12]})

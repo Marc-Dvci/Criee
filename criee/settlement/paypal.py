@@ -19,6 +19,8 @@ import httpx
 from ..domain import money
 
 SANDBOX = "https://api-m.sandbox.paypal.com"
+PNG_MAGIC = bytes([0x89]) + b"PNG"
+CRLF = bytes([13, 10])
 
 
 @dataclass
@@ -190,6 +192,26 @@ class PayPalClient:
         return await self.call("POST", "/v3/vault/payment-tokens",
                                {"payment_source": {"token": {"id": setup_token_id, "type": "SETUP_TOKEN"}}},
                                rid=request_id("ptoken", ref))
+
+    async def invoice_qr_png(self, invoice_id: str, size: int = 300) -> Optional[bytes]:
+        """The invoice's payment QR code. PayPal answers with a base64 PNG, possibly inside a multipart body."""
+        async with self._sem:
+            h = {"Authorization": f"Bearer {await self._access_token()}", "Content-Type": "application/json"}
+            r = await self._http.post(f"{self.base}/v2/invoicing/invoices/{invoice_id}/generate-qr-code",
+                                      headers=h, json={"width": size, "height": size, "action": "pay"})
+        if r.status_code >= 300:
+            return None
+        if r.content.startswith(PNG_MAGIC):
+            return r.content
+        for part in r.content.split(CRLF * 2)[1:]:
+            chunk = part.split(CRLF + b"--")[0].strip()
+            try:
+                data = base64.b64decode(chunk, validate=False)
+            except ValueError:
+                continue
+            if data.startswith(PNG_MAGIC):
+                return data
+        return None
 
     # -- disputes ------------------------------------------------------------------------
 

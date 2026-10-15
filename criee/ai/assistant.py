@@ -7,6 +7,7 @@ Confirm, through the same endpoint the console uses.
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
 import re
@@ -147,6 +148,13 @@ def _lift_images(out: Any, found: list[str]) -> Any:
 
 
 async def _run_tool(core, acc, api, name: str, args: dict) -> dict:
+    if name == "generate_invoice_qr_code" and hasattr(core.paypal, "invoice_qr_png"):
+        # paypal-agent-toolkit 1.11 parses only JSON bodies, and this endpoint returns the image itself.
+        png = await core.paypal.invoice_qr_png(str(args.get("invoice_id", "")))
+        if png is None:
+            return {"error": "PayPal did not return a QR code for this invoice", "via": "paypal_rest"}
+        return {"result": {"invoice_id": args.get("invoice_id"), "qr_png_base64": base64.b64encode(png).decode()},
+                "via": "paypal_rest"}
     if name in TOOLKIT_ALLOWED and api is not None:
         if name == "list_disputes":
             args = {k: v for k, v in args.items() if k in ("disputed_transaction_id", "dispute_state", "page_size")}

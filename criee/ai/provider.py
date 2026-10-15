@@ -99,7 +99,7 @@ class AI:
         self.cfg = cfg
         self.budget = Budget(cfg, kv_get, kv_set)
         self.cache_dir = cache_dir or cfg.data_dir / "ai_cache"
-        self._http = httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=10.0))
+        self._http = httpx.AsyncClient(timeout=httpx.Timeout(35.0, connect=10.0))
         self.last_source: Optional[str] = None
 
     @property
@@ -122,7 +122,16 @@ class AI:
     async def _generate(self, body: dict) -> dict:
         url = (f"https://aiplatform.googleapis.com/v1/publishers/google/models/{self.model}:generateContent"
                f"?key={self.cfg.gemini_api_key}")
-        r = await self._http.post(url, json=body)
+        r = None
+        for attempt in range(2):
+            try:
+                r = await self._http.post(url, json=body)
+                break
+            except (httpx.TimeoutException, httpx.TransportError) as e:
+                if attempt == 1:
+                    raise AIUnavailable(f"model unreachable: {type(e).__name__}")
+        if r.status_code >= 500 or r.status_code == 429:
+            raise AIUnavailable(f"model busy {r.status_code}")
         if r.status_code >= 400:
             raise AIUnavailable(f"model error {r.status_code}: {r.text[:300]}")
         return r.json()

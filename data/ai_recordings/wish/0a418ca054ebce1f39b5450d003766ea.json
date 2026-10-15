@@ -1,0 +1,56 @@
+{
+ "task": "wish",
+ "model": "gemini-3.7-flash",
+ "ms": 2145,
+ "usage": {
+  "promptTokenCount": 1232,
+  "candidatesTokenCount": 205,
+  "totalTokenCount": 1437,
+  "trafficType": "ON_DEMAND",
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 1232
+   }
+  ],
+  "candidatesTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 205
+   }
+  ]
+ },
+ "output": {
+  "item_label": "organic sourdough loaf",
+  "category": "bread",
+  "constraints": [
+   {
+    "attr": "organic",
+    "op": "is",
+    "value_bool": true,
+    "value_int": null
+   }
+  ],
+  "limit_eur": 5.0,
+  "units": 1,
+  "max_matches_per_week": 2,
+  "budget_eur_per_week": null,
+  "radius_m": null,
+  "days": [
+   "mon",
+   "tue",
+   "wed",
+   "thu",
+   "fri"
+  ],
+  "from_hhmm": "18:00",
+  "until_hhmm": null,
+  "modes": [
+   "call",
+   "clock",
+   "threshold"
+  ],
+  "valid_days": 30,
+  "questions": []
+ }
+}

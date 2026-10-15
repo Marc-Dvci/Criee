@@ -1,0 +1,162 @@
+{
+ "task": "supply",
+ "model": "gemini-3.7-flash",
+ "ms": 5575,
+ "usage": {
+  "promptTokenCount": 1700,
+  "candidatesTokenCount": 885,
+  "totalTokenCount": 2585,
+  "trafficType": "ON_DEMAND",
+  "promptTokensDetails": [
+   {
+    "modality": "IMAGE",
+    "tokenCount": 532
+   },
+   {
+    "modality": "TEXT",
+    "tokenCount": 1168
+   }
+  ],
+  "candidatesTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 885
+   }
+  ]
+ },
+ "output": {
+  "transcript": "",
+  "items": [
+   {
+    "name": "Sourdough bread",
+    "name_fr": "Pain au levain",
+    "category": "bread",
+    "quantity": 6,
+    "unit_label": "loaf",
+    "price_source": "label",
+    "image_index": 0,
+    "box_2d": [
+     221,
+     31,
+     359,
+     490
+    ],
+    "facts": [
+     {
+      "attr": "weight_g",
+      "source": "label",
+      "quote": "800 g",
+      "box_2d": [
+       90,
+       31,
+       188,
+       290
+      ],
+      "image_index": 0,
+      "value_bool": null,
+      "value_int": 800
+     },
+     {
+      "attr": "organic",
+      "source": "label",
+      "quote": "BIO",
+      "box_2d": [
+       90,
+       31,
+       188,
+       290
+      ],
+      "image_index": 0,
+      "value_bool": true,
+      "value_int": null
+     }
+    ],
+    "price_eur": 4.8
+   },
+   {
+    "name": "Country bread",
+    "name_fr": "Pain de campagne",
+    "category": "bread",
+    "quantity": 5,
+    "unit_label": "loaf",
+    "price_source": "label",
+    "image_index": 0,
+    "box_2d": [
+     239,
+     546,
+     358,
+     966
+    ],
+    "facts": [],
+    "price_eur": 3.9
+   },
+   {
+    "name": "Rye bread",
+    "name_fr": "Pain de seigle",
+    "category": "bread",
+    "quantity": 4,
+    "unit_label": "loaf",
+    "price_source": "label",
+    "image_index": 0,
+    "box_2d": [
+     620,
+     46,
+     769,
+     447
+    ],
+    "facts": [
+     {
+      "attr": "gluten_free",
+      "source": "label",
+      "quote": "SANS GLUTEN",
+      "box_2d": [
+       467,
+       47,
+       565,
+       329
+      ],
+      "image_index": 0,
+      "value_bool": true,
+      "value_int": null
+     }
+    ],
+    "price_eur": 5.5
+   },
+   {
+    "name": "Pure butter croissant",
+    "name_fr": "Croissant pur beurre",
+    "category": "pastry",
+    "quantity": 8,
+    "unit_label": "piece",
+    "price_source": "label",
+    "image_index": 0,
+    "box_2d": [
+     632,
+     499,
+     759,
+     861
+    ],
+    "facts": [
+     {
+      "attr": "contains_dairy",
+      "source": "label",
+      "quote": "beurre",
+      "box_2d": [
+       489,
+       547,
+       587,
+       806
+      ],
+      "image_index": 0,
+      "value_bool": true,
+      "value_int": null
+     }
+    ],
+    "price_eur": 1.4
+   }
+  ],
+  "mode_hint": "none",
+  "close_hhmm": null,
+  "floor_eur": null
+ }
+}

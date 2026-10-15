@@ -1,0 +1,58 @@
+{
+ "task": "wish",
+ "model": "gemini-3.7-flash",
+ "ms": 10099,
+ "usage": {
+  "promptTokenCount": 1229,
+  "candidatesTokenCount": 215,
+  "totalTokenCount": 1444,
+  "trafficType": "ON_DEMAND",
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 1229
+   }
+  ],
+  "candidatesTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 215
+   }
+  ]
+ },
+ "output": {
+  "item_label": "pain de seigle sans gluten",
+  "category": "bread",
+  "constraints": [
+   {
+    "attr": "gluten_free",
+    "op": "is",
+    "value_bool": true,
+    "value_int": null
+   }
+  ],
+  "limit_eur": 6.0,
+  "units": 1,
+  "max_matches_per_week": 3,
+  "budget_eur_per_week": null,
+  "radius_m": null,
+  "days": [
+   "mon",
+   "tue",
+   "wed",
+   "thu",
+   "fri",
+   "sat",
+   "sun"
+  ],
+  "from_hhmm": "18:00",
+  "until_hhmm": null,
+  "modes": [
+   "call",
+   "clock",
+   "threshold"
+  ],
+  "valid_days": 30,
+  "questions": []
+ }
+}

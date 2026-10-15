@@ -1,0 +1,64 @@
+{
+ "task": "wish",
+ "model": "gemini-3.7-flash",
+ "ms": 8057,
+ "usage": {
+  "promptTokenCount": 1228,
+  "candidatesTokenCount": 254,
+  "totalTokenCount": 1482,
+  "trafficType": "ON_DEMAND",
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 1228
+   }
+  ],
+  "candidatesTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 254
+   }
+  ]
+ },
+ "output": {
+  "item_label": "vegetable box",
+  "category": "grocery_box",
+  "constraints": [
+   {
+    "attr": "weight_g",
+    "op": "gte",
+    "value_bool": null,
+    "value_int": 10000
+   },
+   {
+    "attr": "local",
+    "op": "is",
+    "value_bool": true,
+    "value_int": null
+   }
+  ],
+  "limit_eur": 28.0,
+  "units": 1,
+  "max_matches_per_week": 3,
+  "budget_eur_per_week": null,
+  "radius_m": null,
+  "days": [
+   "mon",
+   "tue",
+   "wed",
+   "thu",
+   "fri",
+   "sat",
+   "sun"
+  ],
+  "from_hhmm": null,
+  "until_hhmm": null,
+  "modes": [
+   "call",
+   "clock",
+   "threshold"
+  ],
+  "valid_days": 30,
+  "questions": []
+ }
+}

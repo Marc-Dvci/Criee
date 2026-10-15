@@ -1,0 +1,58 @@
+{
+ "task": "wish",
+ "model": "gemini-3.7-flash",
+ "ms": 2198,
+ "usage": {
+  "promptTokenCount": 1228,
+  "candidatesTokenCount": 210,
+  "totalTokenCount": 1438,
+  "trafficType": "ON_DEMAND",
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 1228
+   }
+  ],
+  "candidatesTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 210
+   }
+  ]
+ },
+ "output": {
+  "item_label": "vegetarian dinner",
+  "category": "prepared_meal",
+  "constraints": [
+   {
+    "attr": "vegetarian",
+    "op": "is",
+    "value_bool": true,
+    "value_int": null
+   }
+  ],
+  "limit_eur": 6.0,
+  "units": 1,
+  "max_matches_per_week": 3,
+  "budget_eur_per_week": null,
+  "radius_m": 1500,
+  "days": [
+   "mon",
+   "tue",
+   "wed",
+   "thu",
+   "fri",
+   "sat",
+   "sun"
+  ],
+  "from_hhmm": null,
+  "until_hhmm": null,
+  "modes": [
+   "call",
+   "clock",
+   "threshold"
+  ],
+  "valid_days": 30,
+  "questions": []
+ }
+}

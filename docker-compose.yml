@@ -1,0 +1,13 @@
+services:
+  criee:
+    build: .
+    ports: ["8000:8000"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      CRIEE_PUBLIC_URL: ${CRIEE_PUBLIC_URL:-http://localhost:8000}
+    volumes:
+      - criee-data:/data
+volumes:
+  criee-data:

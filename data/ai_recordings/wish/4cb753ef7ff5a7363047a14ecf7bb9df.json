@@ -1,0 +1,45 @@
+{
+ "task": "wish",
+ "model": "gemini-3.7-flash",
+ "ms": 20761,
+ "usage": {
+  "promptTokenCount": 1222,
+  "candidatesTokenCount": 144,
+  "totalTokenCount": 1366,
+  "trafficType": "ON_DEMAND",
+  "promptTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 1222
+   }
+  ],
+  "candidatesTokensDetails": [
+   {
+    "modality": "TEXT",
+    "tokenCount": 144
+   }
+  ]
+ },
+ "output": {
+  "item_label": "croissants",
+  "category": "pastry",
+  "constraints": [],
+  "limit_eur": 1.5,
+  "units": 2,
+  "max_matches_per_week": 3,
+  "budget_eur_per_week": null,
+  "radius_m": null,
+  "days": [
+   "sat"
+  ],
+  "from_hhmm": null,
+  "until_hhmm": null,
+  "modes": [
+   "call",
+   "clock",
+   "threshold"
+  ],
+  "valid_days": 30,
+  "questions": []
+ }
+}

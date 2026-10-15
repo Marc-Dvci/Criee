@@ -66,8 +66,11 @@ SCHEMA: dict[str, Any] = {
 SYSTEM = """You turn a person's request into a standing purchase order for Criée, a market where local
 sellers clear food and services that would otherwise go to waste. Fill the schema literally from what
 the person said. Rules:
-- category: the closest enum value. Croissants, pains au chocolat, cakes and tarts are pastry.
-- constraints: only properties the person asked for. Use op "is" with value_bool for yes/no properties,
+- category: the closest enum value. Croissants, pains au chocolat, cakes and tarts are pastry. A box,
+  basket, crate or parcel of mixed fruit and vegetables is grocery_box, not produce.
+- item_label: the item only, without the quantity ("croissants", not "two croissants").
+- constraints: only properties the person explicitly asked for. "For one", "a dinner", "a loaf" are not
+  constraints; never add servings, weight or freshness unless a number or condition was stated. Use op "is" with value_bool for yes/no properties,
   op "gte"/"lte" with value_int for numbers (weight_g in grams, best_before_hours, servings, duration_min).
 - limit_eur: the highest price per unit they accept. Null if they gave none, and then ask one question.
 - units: items per purchase (default 1). max_matches_per_week: how often per week (default 3).
@@ -120,6 +123,8 @@ def to_terms(d: dict, pickup: GeoPoint, now: datetime) -> tuple[Optional[WishTer
                 v = c.get("value_bool")
                 cons.append(Constraint(attr=attr, op=Op.IS, value=True if v is None else bool(v)))
             elif c.get("value_int") is not None and c.get("op") in ("gte", "lte"):
+                if c["op"] == "gte" and int(c["value_int"]) <= 1:
+                    continue
                 cons.append(Constraint(attr=attr, op=Op(c["op"]), value=int(c["value_int"])))
         except (KeyError, ValueError):
             continue
@@ -194,13 +199,13 @@ def readback(t: WishTerms, label: str, place: str) -> str:
 # ----------------------------------------------------------------------------- rules path
 
 RULES_CATEGORY = [
+    (Category.GROCERY_BOX, r"box|panier|colis|basket|crate|parcel"),
     (Category.PASTRY, r"croissant|pain au chocolat|chocolatine|viennoiserie|pastr|tarte|tart|cake|gâteau|gateau|kouglof|kougelhopf|brioche|éclair|eclair|patisserie|pâtisserie"),
     (Category.BREAD, r"bread|pain|baguette|levain|sourdough|loaf|loaves|miche|bretzel|pretzel"),
     (Category.PRODUCE, r"vegetable|légume|legume|fruit|apple|pomme|tomato|salad|salade|veg\b|produce"),
     (Category.DAIRY, r"cheese|fromage|yogh?urt|yaourt|milk|lait|dairy|munster"),
     (Category.PREPARED_MEAL, r"meal|repas|dinner|dîner|lunch|déjeuner|plat|choucroute|tarte flambée|flammekueche|sushi"),
     (Category.FLOWERS, r"flower|fleur|bouquet"),
-    (Category.GROCERY_BOX, r"box|panier|colis|basket|crate|parcel"),
     (Category.SERVICE_SLOT, r"haircut|coupe|coiffeur|hairdresser|appointment|slot|massage|rendez"),
 ]
 RULES_ATTR = [
@@ -265,6 +270,7 @@ async def compile_wish(ai: Optional[AI], text: str, pickup: GeoPoint, place: str
     if raw is None:
         raw = parse_rules(text)
     label = re.sub(r"[^\w\s\-'’àâäéèêëîïôöùûüç]", "", str(raw.get("item_label") or "item"))[:40].strip() or "item"
+    label = re.sub(r"^(?:\d+|one|two|three|four|five|six|a|an|un|une|deux|trois|quatre)\s+", "", label, flags=re.I) or label
     try:
         terms, questions = to_terms(raw, pickup, now)
     except (ValueError, KeyError) as e:

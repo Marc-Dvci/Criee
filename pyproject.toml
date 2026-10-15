@@ -1,0 +1,31 @@
+[project]
+name = "criee"
+version = "1.0.0"
+description = "A clearing house where standing wishes meet end-of-day supply, settled through PayPal."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "pydantic>=2.9",
+  "httpx>=0.27",
+  "cryptography>=43",
+  "webauthn>=2.2",
+  "reportlab>=4.2",
+  "pillow>=10.4",
+  "mcp>=2.0",
+  "python-multipart>=0.0.9",
+  "tzdata>=2024.1",
+  "paypal-agent-toolkit>=1.11",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "hypothesis>=6.100", "pypdf>=5", "matplotlib>=3.9", "numpy>=2"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["criee*"]

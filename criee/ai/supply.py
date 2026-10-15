@@ -22,7 +22,7 @@ SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
         "transcript": {"type": "string", "description": "verbatim transcript of the audio, empty if none"},
-        "items": {"type": "array", "maxItems": 12, "items": {
+        "items": {"type": "array", "items": {
             "type": "object",
             "properties": {
                 "name": {"type": "string", "description": "short English product name"},
@@ -33,9 +33,9 @@ SCHEMA: dict[str, Any] = {
                 "price_eur": {"type": "number", "nullable": True},
                 "price_source": {"type": "string", "enum": ["label", "spoken", "none"]},
                 "image_index": {"type": "integer", "minimum": 0},
-                "box_2d": {"type": "array", "minItems": 4, "maxItems": 4,
+                "box_2d": {"type": "array",
                            "items": {"type": "integer", "minimum": 0, "maximum": 1000}},
-                "facts": {"type": "array", "maxItems": 8, "items": {
+                "facts": {"type": "array", "items": {
                     "type": "object",
                     "properties": {
                         "attr": {"type": "string", "enum": [a.value for a in Attr]},
@@ -43,7 +43,7 @@ SCHEMA: dict[str, Any] = {
                         "value_int": {"type": "integer", "nullable": True},
                         "source": {"type": "string", "enum": ["label", "spoken"]},
                         "image_index": {"type": "integer", "nullable": True},
-                        "box_2d": {"type": "array", "nullable": True, "minItems": 4, "maxItems": 4,
+                        "box_2d": {"type": "array", "nullable": True,
                                    "items": {"type": "integer", "minimum": 0, "maximum": 1000}},
                         "quote": {"type": "string", "description": "the exact words read on the label or heard"}},
                     "required": ["attr", "source", "quote"]}}},
@@ -151,7 +151,7 @@ async def read_shelf(ai: Optional[AI], images: list[bytes], audio: Optional[Medi
                                     image_ids[0] if image_ids else None, None)], "", None, None, None, source, image_ids)
     transcript = str(raw.get("transcript") or "")
     lots = []
-    for it in raw.get("items") or []:
+    for it in (raw.get("items") or [])[:12]:
         try:
             idx = int(it.get("image_index") or 0)
             image_id = image_ids[idx] if 0 <= idx < len(image_ids) else (image_ids[0] if image_ids else None)
@@ -164,7 +164,7 @@ async def read_shelf(ai: Optional[AI], images: list[bytes], audio: Optional[Medi
         except (KeyError, ValueError, TypeError):
             continue
         seen: set[Attr] = set()
-        for f in it.get("facts") or []:
+        for f in (it.get("facts") or [])[:8]:
             try:
                 attr = Attr(f["attr"])
             except (KeyError, ValueError):

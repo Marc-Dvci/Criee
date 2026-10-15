@@ -273,3 +273,8 @@ textarea.input { resize: vertical; min-height: 92px; line-height: 1.45; }
   .topbar { padding: 10px 14px; gap: 10px; }
   .nav a { padding: 6px 9px; }
 }
+@media (max-width: 600px) {
+  .nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: 0; }
+  .nav::-webkit-scrollbar { display: none; }
+  .status-pill .chip { display: none; }
+}

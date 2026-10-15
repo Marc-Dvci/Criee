@@ -73,7 +73,7 @@ function PayPalSetup({ session }: { session: Session }) {
         <button className="btn primary" onClick={start} disabled={!!busy}>{busy === 'paypal' ? <Spinner /> : null} Save my PayPal (sandbox)</button>
         <button className="btn" onClick={demo} disabled={!!busy}>Use the demo wallet</button>
       </div>
-      {session.status?.sandbox_buyer && <div className="small faint">Sandbox buyer for the PayPal login: <span className="mono">{session.status.sandbox_buyer}</span> (password in the README).</div>}
+      <div className="small faint">Save my PayPal opens the PayPal sandbox: log in with any sandbox personal account.</div>
     </div>
   )
 }

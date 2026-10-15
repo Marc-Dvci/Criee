@@ -42,7 +42,7 @@ export type Draft = {
 }
 
 export type Status = {
-  paypal: string; currency: string; fee_bps: number; sandbox_buyer: string | null
+  paypal: string; currency: string; fee_bps: number
   ai: { provider: string; model: string; live_until: string | null; calls_today: number; daily_cap: number }
   ledger: { events: number; head: string }
 }

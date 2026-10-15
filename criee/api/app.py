@@ -164,7 +164,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
                        "live_until": cfg.ai_until.isoformat() if cfg.ai_until else None,
                        "calls_today": core.ai.budget.calls_today() if core.ai else 0, "daily_cap": cfg.ai_daily_cap},
                 "ledger": {"events": core.ledger.head[0], "head": core.ledger.head[1]},
-                "fee_bps": cfg.fee_bps, "sandbox_buyer": cfg.sandbox_buyer_email}
+                "fee_bps": cfg.fee_bps}
 
     @app.get("/api/me")
     def get_me(request: Request) -> dict:

@@ -9,6 +9,8 @@
   },
   "headline": {
     "adoption": 0.03,
+    "walk_by_p": 0.1,
+    "open_p": 0.25,
     "seeds": [
       0,
       1,
@@ -55,18 +57,18 @@
           },
           "B": {
             "units_supplied_per_be": 12.035714,
-            "units_sold_per_be": 11.107143,
-            "units_wasted_per_be": 0.928571,
-            "seller_revenue_gross_eur_per_be": 16.564762,
-            "seller_revenue_net_eur_per_be": 16.564762,
-            "mean_price_paid_eur": 1.491361,
-            "mean_buyer_surplus_eur": 1.48015,
-            "share_holders_served": 0.696667,
+            "units_sold_per_be": 6.464286,
+            "units_wasted_per_be": 5.571429,
+            "seller_revenue_gross_eur_per_be": 9.592143,
+            "seller_revenue_net_eur_per_be": 9.592143,
+            "mean_price_paid_eur": 1.483867,
+            "mean_buyer_surplus_eur": 1.494088,
+            "share_holders_served": 0.603333,
             "units_supplied_week": 1011,
-            "units_sold_week": 933,
-            "units_wasted_week": 78,
-            "seller_revenue_gross_eur_week": 1391.44,
-            "seller_revenue_net_eur_week": 1391.44
+            "units_sold_week": 543,
+            "units_wasted_week": 468,
+            "seller_revenue_gross_eur_week": 805.74,
+            "seller_revenue_net_eur_week": 805.74
           },
           "C": {
             "units_supplied_per_be": 12.035714,
@@ -83,6 +85,10 @@
             "seller_revenue_gross_eur_week": 2307.92,
             "seller_revenue_net_eur_week": 2215.6032
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -108,18 +114,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.416667,
-            "units_sold_per_be": 13.321429,
-            "units_wasted_per_be": 1.095238,
-            "seller_revenue_gross_eur_per_be": 19.423571,
-            "seller_revenue_net_eur_per_be": 19.423571,
-            "mean_price_paid_eur": 1.45807,
-            "mean_buyer_surplus_eur": 1.466059,
-            "share_holders_served": 0.793333,
+            "units_sold_per_be": 6.178571,
+            "units_wasted_per_be": 8.238095,
+            "seller_revenue_gross_eur_per_be": 9.104286,
+            "seller_revenue_net_eur_per_be": 9.104286,
+            "mean_price_paid_eur": 1.473526,
+            "mean_buyer_surplus_eur": 1.401908,
+            "share_holders_served": 0.576667,
             "units_supplied_week": 1211,
-            "units_sold_week": 1119,
-            "units_wasted_week": 92,
-            "seller_revenue_gross_eur_week": 1631.58,
-            "seller_revenue_net_eur_week": 1631.58
+            "units_sold_week": 519,
+            "units_wasted_week": 692,
+            "seller_revenue_gross_eur_week": 764.76,
+            "seller_revenue_net_eur_week": 764.76
           },
           "C": {
             "units_supplied_per_be": 14.416667,
@@ -136,6 +142,10 @@
             "seller_revenue_gross_eur_week": 2283.87,
             "seller_revenue_net_eur_week": 2192.5152
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -161,18 +171,18 @@
           },
           "B": {
             "units_supplied_per_be": 12.630952,
-            "units_sold_per_be": 11.75,
-            "units_wasted_per_be": 0.880952,
-            "seller_revenue_gross_eur_per_be": 17.575952,
-            "seller_revenue_net_eur_per_be": 17.575952,
-            "mean_price_paid_eur": 1.495826,
-            "mean_buyer_surplus_eur": 1.365056,
-            "share_holders_served": 0.71,
+            "units_sold_per_be": 6.321429,
+            "units_wasted_per_be": 6.309524,
+            "seller_revenue_gross_eur_per_be": 9.417024,
+            "seller_revenue_net_eur_per_be": 9.417024,
+            "mean_price_paid_eur": 1.489699,
+            "mean_buyer_surplus_eur": 1.344934,
+            "share_holders_served": 0.59,
             "units_supplied_week": 1061,
-            "units_sold_week": 987,
-            "units_wasted_week": 74,
-            "seller_revenue_gross_eur_week": 1476.38,
-            "seller_revenue_net_eur_week": 1476.38
+            "units_sold_week": 531,
+            "units_wasted_week": 530,
+            "seller_revenue_gross_eur_week": 791.03,
+            "seller_revenue_net_eur_week": 791.03
           },
           "C": {
             "units_supplied_per_be": 12.630952,
@@ -189,6 +199,10 @@
             "seller_revenue_gross_eur_week": 2285.41,
             "seller_revenue_net_eur_week": 2193.9936
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -214,18 +228,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.809524,
-            "units_sold_per_be": 12.678571,
-            "units_wasted_per_be": 1.130952,
-            "seller_revenue_gross_eur_per_be": 19.115952,
-            "seller_revenue_net_eur_per_be": 19.115952,
-            "mean_price_paid_eur": 1.507737,
-            "mean_buyer_surplus_eur": 1.433136,
-            "share_holders_served": 0.73,
+            "units_sold_per_be": 5.821429,
+            "units_wasted_per_be": 7.988095,
+            "seller_revenue_gross_eur_per_be": 8.613452,
+            "seller_revenue_net_eur_per_be": 8.613452,
+            "mean_price_paid_eur": 1.479611,
+            "mean_buyer_surplus_eur": 1.54229,
+            "share_holders_served": 0.543333,
             "units_supplied_week": 1160,
-            "units_sold_week": 1065,
-            "units_wasted_week": 95,
-            "seller_revenue_gross_eur_week": 1605.74,
-            "seller_revenue_net_eur_week": 1605.74
+            "units_sold_week": 489,
+            "units_wasted_week": 671,
+            "seller_revenue_gross_eur_week": 723.53,
+            "seller_revenue_net_eur_week": 723.53
           },
           "C": {
             "units_supplied_per_be": 13.809524,
@@ -242,6 +256,10 @@
             "seller_revenue_gross_eur_week": 2402.3,
             "seller_revenue_net_eur_week": 2306.208
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -267,18 +285,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.5,
-            "units_sold_per_be": 13.428571,
-            "units_wasted_per_be": 1.071429,
-            "seller_revenue_gross_eur_per_be": 21.11631,
-            "seller_revenue_net_eur_per_be": 21.11631,
-            "mean_price_paid_eur": 1.572491,
-            "mean_buyer_surplus_eur": 1.471764,
-            "share_holders_served": 0.756667,
+            "units_sold_per_be": 5.964286,
+            "units_wasted_per_be": 8.535714,
+            "seller_revenue_gross_eur_per_be": 9.15619,
+            "seller_revenue_net_eur_per_be": 9.15619,
+            "mean_price_paid_eur": 1.53517,
+            "mean_buyer_surplus_eur": 1.488962,
+            "share_holders_served": 0.556667,
             "units_supplied_week": 1218,
-            "units_sold_week": 1128,
-            "units_wasted_week": 90,
-            "seller_revenue_gross_eur_week": 1773.77,
-            "seller_revenue_net_eur_week": 1773.77
+            "units_sold_week": 501,
+            "units_wasted_week": 717,
+            "seller_revenue_gross_eur_week": 769.12,
+            "seller_revenue_net_eur_week": 769.12
           },
           "C": {
             "units_supplied_per_be": 14.5,
@@ -295,6 +313,10 @@
             "seller_revenue_gross_eur_week": 2426.89,
             "seller_revenue_net_eur_week": 2329.8144
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -320,18 +342,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.904762,
-            "units_sold_per_be": 12.678571,
-            "units_wasted_per_be": 1.22619,
-            "seller_revenue_gross_eur_per_be": 17.727262,
-            "seller_revenue_net_eur_per_be": 17.727262,
-            "mean_price_paid_eur": 1.398207,
-            "mean_buyer_surplus_eur": 1.496779,
-            "share_holders_served": 0.733333,
+            "units_sold_per_be": 6.107143,
+            "units_wasted_per_be": 7.797619,
+            "seller_revenue_gross_eur_per_be": 8.595238,
+            "seller_revenue_net_eur_per_be": 8.595238,
+            "mean_price_paid_eur": 1.407407,
+            "mean_buyer_surplus_eur": 1.556803,
+            "share_holders_served": 0.57,
             "units_supplied_week": 1168,
-            "units_sold_week": 1065,
-            "units_wasted_week": 103,
-            "seller_revenue_gross_eur_week": 1489.09,
-            "seller_revenue_net_eur_week": 1489.09
+            "units_sold_week": 513,
+            "units_wasted_week": 655,
+            "seller_revenue_gross_eur_week": 722.0,
+            "seller_revenue_net_eur_week": 722.0
           },
           "C": {
             "units_supplied_per_be": 13.904762,
@@ -348,6 +370,10 @@
             "seller_revenue_gross_eur_week": 2349.69,
             "seller_revenue_net_eur_week": 2255.7024
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -373,18 +399,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.571429,
-            "units_sold_per_be": 12.392857,
-            "units_wasted_per_be": 1.178571,
-            "seller_revenue_gross_eur_per_be": 19.571905,
-            "seller_revenue_net_eur_per_be": 19.571905,
-            "mean_price_paid_eur": 1.579289,
-            "mean_buyer_surplus_eur": 1.376417,
-            "share_holders_served": 0.743333,
+            "units_sold_per_be": 6.25,
+            "units_wasted_per_be": 7.321429,
+            "seller_revenue_gross_eur_per_be": 10.002857,
+            "seller_revenue_net_eur_per_be": 10.002857,
+            "mean_price_paid_eur": 1.600457,
+            "mean_buyer_surplus_eur": 1.312914,
+            "share_holders_served": 0.583333,
             "units_supplied_week": 1140,
-            "units_sold_week": 1041,
-            "units_wasted_week": 99,
-            "seller_revenue_gross_eur_week": 1644.04,
-            "seller_revenue_net_eur_week": 1644.04
+            "units_sold_week": 525,
+            "units_wasted_week": 615,
+            "seller_revenue_gross_eur_week": 840.24,
+            "seller_revenue_net_eur_week": 840.24
           },
           "C": {
             "units_supplied_per_be": 13.571429,
@@ -401,6 +427,10 @@
             "seller_revenue_gross_eur_week": 2392.52,
             "seller_revenue_net_eur_week": 2296.8192
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -426,18 +456,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.630952,
-            "units_sold_per_be": 13.607143,
-            "units_wasted_per_be": 1.02381,
-            "seller_revenue_gross_eur_per_be": 21.239762,
-            "seller_revenue_net_eur_per_be": 21.239762,
-            "mean_price_paid_eur": 1.560927,
-            "mean_buyer_surplus_eur": 1.443351,
-            "share_holders_served": 0.783333,
+            "units_sold_per_be": 6.071429,
+            "units_wasted_per_be": 8.559524,
+            "seller_revenue_gross_eur_per_be": 9.369405,
+            "seller_revenue_net_eur_per_be": 9.369405,
+            "mean_price_paid_eur": 1.543196,
+            "mean_buyer_surplus_eur": 1.495627,
+            "share_holders_served": 0.566667,
             "units_supplied_week": 1229,
-            "units_sold_week": 1143,
-            "units_wasted_week": 86,
-            "seller_revenue_gross_eur_week": 1784.14,
-            "seller_revenue_net_eur_week": 1784.14
+            "units_sold_week": 510,
+            "units_wasted_week": 719,
+            "seller_revenue_gross_eur_week": 787.03,
+            "seller_revenue_net_eur_week": 787.03
           },
           "C": {
             "units_supplied_per_be": 14.630952,
@@ -454,6 +484,10 @@
             "seller_revenue_gross_eur_week": 2444.45,
             "seller_revenue_net_eur_week": 2346.672
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -479,18 +513,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.821429,
-            "units_sold_per_be": 13.607143,
-            "units_wasted_per_be": 1.214286,
-            "seller_revenue_gross_eur_per_be": 20.321429,
-            "seller_revenue_net_eur_per_be": 20.321429,
-            "mean_price_paid_eur": 1.493438,
-            "mean_buyer_surplus_eur": 1.474803,
-            "share_holders_served": 0.796667,
+            "units_sold_per_be": 6.392857,
+            "units_wasted_per_be": 8.428571,
+            "seller_revenue_gross_eur_per_be": 9.770357,
+            "seller_revenue_net_eur_per_be": 9.770357,
+            "mean_price_paid_eur": 1.528324,
+            "mean_buyer_surplus_eur": 1.410279,
+            "share_holders_served": 0.596667,
             "units_supplied_week": 1245,
-            "units_sold_week": 1143,
-            "units_wasted_week": 102,
-            "seller_revenue_gross_eur_week": 1707.0,
-            "seller_revenue_net_eur_week": 1707.0
+            "units_sold_week": 537,
+            "units_wasted_week": 708,
+            "seller_revenue_gross_eur_week": 820.71,
+            "seller_revenue_net_eur_week": 820.71
           },
           "C": {
             "units_supplied_per_be": 14.821429,
@@ -507,6 +541,10 @@
             "seller_revenue_gross_eur_week": 2402.1,
             "seller_revenue_net_eur_week": 2306.016
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -532,18 +570,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.0,
-            "units_sold_per_be": 13.071429,
-            "units_wasted_per_be": 0.928571,
-            "seller_revenue_gross_eur_per_be": 19.064405,
-            "seller_revenue_net_eur_per_be": 19.064405,
-            "mean_price_paid_eur": 1.458479,
-            "mean_buyer_surplus_eur": 1.458734,
-            "share_holders_served": 0.773333,
+            "units_sold_per_be": 6.464286,
+            "units_wasted_per_be": 7.535714,
+            "seller_revenue_gross_eur_per_be": 9.296429,
+            "seller_revenue_net_eur_per_be": 9.296429,
+            "mean_price_paid_eur": 1.438122,
+            "mean_buyer_surplus_eur": 1.543425,
+            "share_holders_served": 0.603333,
             "units_supplied_week": 1176,
-            "units_sold_week": 1098,
-            "units_wasted_week": 78,
-            "seller_revenue_gross_eur_week": 1601.41,
-            "seller_revenue_net_eur_week": 1601.41
+            "units_sold_week": 543,
+            "units_wasted_week": 633,
+            "seller_revenue_gross_eur_week": 780.9,
+            "seller_revenue_net_eur_week": 780.9
           },
           "C": {
             "units_supplied_per_be": 14.0,
@@ -560,6 +598,10 @@
             "seller_revenue_gross_eur_week": 2371.78,
             "seller_revenue_net_eur_week": 2276.9088
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -585,18 +627,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.452381,
-            "units_sold_per_be": 12.321429,
-            "units_wasted_per_be": 1.130952,
-            "seller_revenue_gross_eur_per_be": 19.700714,
-            "seller_revenue_net_eur_per_be": 19.700714,
-            "mean_price_paid_eur": 1.598899,
-            "mean_buyer_surplus_eur": 1.34542,
-            "share_holders_served": 0.73,
+            "units_sold_per_be": 5.857143,
+            "units_wasted_per_be": 7.595238,
+            "seller_revenue_gross_eur_per_be": 9.194524,
+            "seller_revenue_net_eur_per_be": 9.194524,
+            "mean_price_paid_eur": 1.569797,
+            "mean_buyer_surplus_eur": 1.366789,
+            "share_holders_served": 0.546667,
             "units_supplied_week": 1130,
-            "units_sold_week": 1035,
-            "units_wasted_week": 95,
-            "seller_revenue_gross_eur_week": 1654.86,
-            "seller_revenue_net_eur_week": 1654.86
+            "units_sold_week": 492,
+            "units_wasted_week": 638,
+            "seller_revenue_gross_eur_week": 772.34,
+            "seller_revenue_net_eur_week": 772.34
           },
           "C": {
             "units_supplied_per_be": 13.452381,
@@ -613,6 +655,10 @@
             "seller_revenue_gross_eur_week": 2315.75,
             "seller_revenue_net_eur_week": 2223.12
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -638,18 +684,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.0,
-            "units_sold_per_be": 12.25,
-            "units_wasted_per_be": 0.75,
-            "seller_revenue_gross_eur_per_be": 18.225357,
-            "seller_revenue_net_eur_per_be": 18.225357,
-            "mean_price_paid_eur": 1.487784,
-            "mean_buyer_surplus_eur": 1.381953,
-            "share_holders_served": 0.706667,
+            "units_sold_per_be": 5.607143,
+            "units_wasted_per_be": 7.392857,
+            "seller_revenue_gross_eur_per_be": 8.387976,
+            "seller_revenue_net_eur_per_be": 8.387976,
+            "mean_price_paid_eur": 1.495945,
+            "mean_buyer_surplus_eur": 1.351635,
+            "share_holders_served": 0.523333,
             "units_supplied_week": 1092,
-            "units_sold_week": 1029,
-            "units_wasted_week": 63,
-            "seller_revenue_gross_eur_week": 1530.93,
-            "seller_revenue_net_eur_week": 1530.93
+            "units_sold_week": 471,
+            "units_wasted_week": 621,
+            "seller_revenue_gross_eur_week": 704.59,
+            "seller_revenue_net_eur_week": 704.59
           },
           "C": {
             "units_supplied_per_be": 13.0,
@@ -666,6 +712,10 @@
             "seller_revenue_gross_eur_week": 2165.38,
             "seller_revenue_net_eur_week": 2078.7648
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -691,18 +741,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.011905,
-            "units_sold_per_be": 12.892857,
-            "units_wasted_per_be": 1.119048,
-            "seller_revenue_gross_eur_per_be": 19.612738,
-            "seller_revenue_net_eur_per_be": 19.612738,
-            "mean_price_paid_eur": 1.52121,
-            "mean_buyer_surplus_eur": 1.425439,
-            "share_holders_served": 0.746667,
+            "units_sold_per_be": 6.107143,
+            "units_wasted_per_be": 7.904762,
+            "seller_revenue_gross_eur_per_be": 9.0975,
+            "seller_revenue_net_eur_per_be": 9.0975,
+            "mean_price_paid_eur": 1.489649,
+            "mean_buyer_surplus_eur": 1.409181,
+            "share_holders_served": 0.57,
             "units_supplied_week": 1177,
-            "units_sold_week": 1083,
-            "units_wasted_week": 94,
-            "seller_revenue_gross_eur_week": 1647.47,
-            "seller_revenue_net_eur_week": 1647.47
+            "units_sold_week": 513,
+            "units_wasted_week": 664,
+            "seller_revenue_gross_eur_week": 764.19,
+            "seller_revenue_net_eur_week": 764.19
           },
           "C": {
             "units_supplied_per_be": 14.011905,
@@ -719,6 +769,10 @@
             "seller_revenue_gross_eur_week": 2332.37,
             "seller_revenue_net_eur_week": 2239.0752
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -744,18 +798,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.392857,
-            "units_sold_per_be": 12.392857,
-            "units_wasted_per_be": 1.0,
-            "seller_revenue_gross_eur_per_be": 17.719881,
-            "seller_revenue_net_eur_per_be": 17.719881,
-            "mean_price_paid_eur": 1.429846,
-            "mean_buyer_surplus_eur": 1.585658,
-            "share_holders_served": 0.73,
+            "units_sold_per_be": 6.607143,
+            "units_wasted_per_be": 6.785714,
+            "seller_revenue_gross_eur_per_be": 9.385357,
+            "seller_revenue_net_eur_per_be": 9.385357,
+            "mean_price_paid_eur": 1.420486,
+            "mean_buyer_surplus_eur": 1.580216,
+            "share_holders_served": 0.616667,
             "units_supplied_week": 1125,
-            "units_sold_week": 1041,
-            "units_wasted_week": 84,
-            "seller_revenue_gross_eur_week": 1488.47,
-            "seller_revenue_net_eur_week": 1488.47
+            "units_sold_week": 555,
+            "units_wasted_week": 570,
+            "seller_revenue_gross_eur_week": 788.37,
+            "seller_revenue_net_eur_week": 788.37
           },
           "C": {
             "units_supplied_per_be": 13.392857,
@@ -772,6 +826,10 @@
             "seller_revenue_gross_eur_week": 2373.88,
             "seller_revenue_net_eur_week": 2278.9248
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -797,18 +855,18 @@
           },
           "B": {
             "units_supplied_per_be": 12.595238,
-            "units_sold_per_be": 11.321429,
-            "units_wasted_per_be": 1.27381,
-            "seller_revenue_gross_eur_per_be": 17.498214,
-            "seller_revenue_net_eur_per_be": 17.498214,
-            "mean_price_paid_eur": 1.545584,
-            "mean_buyer_surplus_eur": 1.314953,
-            "share_holders_served": 0.703333,
+            "units_sold_per_be": 5.678571,
+            "units_wasted_per_be": 6.916667,
+            "seller_revenue_gross_eur_per_be": 8.732738,
+            "seller_revenue_net_eur_per_be": 8.732738,
+            "mean_price_paid_eur": 1.537841,
+            "mean_buyer_surplus_eur": 1.446876,
+            "share_holders_served": 0.53,
             "units_supplied_week": 1058,
-            "units_sold_week": 951,
-            "units_wasted_week": 107,
-            "seller_revenue_gross_eur_week": 1469.85,
-            "seller_revenue_net_eur_week": 1469.85
+            "units_sold_week": 477,
+            "units_wasted_week": 581,
+            "seller_revenue_gross_eur_week": 733.55,
+            "seller_revenue_net_eur_week": 733.55
           },
           "C": {
             "units_supplied_per_be": 12.595238,
@@ -825,6 +883,10 @@
             "seller_revenue_gross_eur_week": 2266.0,
             "seller_revenue_net_eur_week": 2175.36
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -850,18 +912,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.619048,
-            "units_sold_per_be": 12.607143,
-            "units_wasted_per_be": 1.011905,
-            "seller_revenue_gross_eur_per_be": 19.014167,
-            "seller_revenue_net_eur_per_be": 19.014167,
-            "mean_price_paid_eur": 1.508206,
-            "mean_buyer_surplus_eur": 1.442502,
-            "share_holders_served": 0.73,
+            "units_sold_per_be": 6.25,
+            "units_wasted_per_be": 7.369048,
+            "seller_revenue_gross_eur_per_be": 9.514762,
+            "seller_revenue_net_eur_per_be": 9.514762,
+            "mean_price_paid_eur": 1.522362,
+            "mean_buyer_surplus_eur": 1.360038,
+            "share_holders_served": 0.583333,
             "units_supplied_week": 1144,
-            "units_sold_week": 1059,
-            "units_wasted_week": 85,
-            "seller_revenue_gross_eur_week": 1597.19,
-            "seller_revenue_net_eur_week": 1597.19
+            "units_sold_week": 525,
+            "units_wasted_week": 619,
+            "seller_revenue_gross_eur_week": 799.24,
+            "seller_revenue_net_eur_week": 799.24
           },
           "C": {
             "units_supplied_per_be": 13.619048,
@@ -878,6 +940,10 @@
             "seller_revenue_gross_eur_week": 2342.28,
             "seller_revenue_net_eur_week": 2248.5888
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -903,18 +969,18 @@
           },
           "B": {
             "units_supplied_per_be": 14.345238,
-            "units_sold_per_be": 13.392857,
-            "units_wasted_per_be": 0.952381,
-            "seller_revenue_gross_eur_per_be": 20.261786,
-            "seller_revenue_net_eur_per_be": 20.261786,
-            "mean_price_paid_eur": 1.51288,
-            "mean_buyer_surplus_eur": 1.376907,
-            "share_holders_served": 0.736667,
+            "units_sold_per_be": 6.107143,
+            "units_wasted_per_be": 8.238095,
+            "seller_revenue_gross_eur_per_be": 9.267143,
+            "seller_revenue_net_eur_per_be": 9.267143,
+            "mean_price_paid_eur": 1.517427,
+            "mean_buyer_surplus_eur": 1.419298,
+            "share_holders_served": 0.57,
             "units_supplied_week": 1205,
-            "units_sold_week": 1125,
-            "units_wasted_week": 80,
-            "seller_revenue_gross_eur_week": 1701.99,
-            "seller_revenue_net_eur_week": 1701.99
+            "units_sold_week": 513,
+            "units_wasted_week": 692,
+            "seller_revenue_gross_eur_week": 778.44,
+            "seller_revenue_net_eur_week": 778.44
           },
           "C": {
             "units_supplied_per_be": 14.345238,
@@ -931,6 +997,10 @@
             "seller_revenue_gross_eur_week": 2369.85,
             "seller_revenue_net_eur_week": 2275.056
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -956,18 +1026,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.916667,
-            "units_sold_per_be": 12.857143,
-            "units_wasted_per_be": 1.059524,
-            "seller_revenue_gross_eur_per_be": 18.525,
-            "seller_revenue_net_eur_per_be": 18.525,
-            "mean_price_paid_eur": 1.440833,
-            "mean_buyer_surplus_eur": 1.423333,
-            "share_holders_served": 0.74,
+            "units_sold_per_be": 6.357143,
+            "units_wasted_per_be": 7.559524,
+            "seller_revenue_gross_eur_per_be": 9.154524,
+            "seller_revenue_net_eur_per_be": 9.154524,
+            "mean_price_paid_eur": 1.440037,
+            "mean_buyer_surplus_eur": 1.391142,
+            "share_holders_served": 0.593333,
             "units_supplied_week": 1169,
-            "units_sold_week": 1080,
-            "units_wasted_week": 89,
-            "seller_revenue_gross_eur_week": 1556.1,
-            "seller_revenue_net_eur_week": 1556.1
+            "units_sold_week": 534,
+            "units_wasted_week": 635,
+            "seller_revenue_gross_eur_week": 768.98,
+            "seller_revenue_net_eur_week": 768.98
           },
           "C": {
             "units_supplied_per_be": 13.916667,
@@ -984,6 +1054,10 @@
             "seller_revenue_gross_eur_week": 2341.42,
             "seller_revenue_net_eur_week": 2247.7632
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -1009,18 +1083,18 @@
           },
           "B": {
             "units_supplied_per_be": 13.880952,
-            "units_sold_per_be": 12.75,
-            "units_wasted_per_be": 1.130952,
-            "seller_revenue_gross_eur_per_be": 19.368333,
-            "seller_revenue_net_eur_per_be": 19.368333,
-            "mean_price_paid_eur": 1.519085,
-            "mean_buyer_surplus_eur": 1.379907,
-            "share_holders_served": 0.743333,
+            "units_sold_per_be": 5.642857,
+            "units_wasted_per_be": 8.238095,
+            "seller_revenue_gross_eur_per_be": 8.780595,
+            "seller_revenue_net_eur_per_be": 8.780595,
+            "mean_price_paid_eur": 1.556055,
+            "mean_buyer_surplus_eur": 1.423945,
+            "share_holders_served": 0.526667,
             "units_supplied_week": 1166,
-            "units_sold_week": 1071,
-            "units_wasted_week": 95,
-            "seller_revenue_gross_eur_week": 1626.94,
-            "seller_revenue_net_eur_week": 1626.94
+            "units_sold_week": 474,
+            "units_wasted_week": 692,
+            "seller_revenue_gross_eur_week": 737.57,
+            "seller_revenue_net_eur_week": 737.57
           },
           "C": {
             "units_supplied_per_be": 13.880952,
@@ -1037,6 +1111,10 @@
             "seller_revenue_gross_eur_week": 2314.85,
             "seller_revenue_net_eur_week": 2222.256
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       },
       {
@@ -1062,18 +1140,18 @@
           },
           "B": {
             "units_supplied_per_be": 12.785714,
-            "units_sold_per_be": 11.75,
-            "units_wasted_per_be": 1.035714,
-            "seller_revenue_gross_eur_per_be": 19.380833,
-            "seller_revenue_net_eur_per_be": 19.380833,
-            "mean_price_paid_eur": 1.649433,
-            "mean_buyer_surplus_eur": 1.350294,
-            "share_holders_served": 0.676667,
+            "units_sold_per_be": 6.035714,
+            "units_wasted_per_be": 6.75,
+            "seller_revenue_gross_eur_per_be": 10.077857,
+            "seller_revenue_net_eur_per_be": 10.077857,
+            "mean_price_paid_eur": 1.669704,
+            "mean_buyer_surplus_eur": 1.300533,
+            "share_holders_served": 0.563333,
             "units_supplied_week": 1074,
-            "units_sold_week": 987,
-            "units_wasted_week": 87,
-            "seller_revenue_gross_eur_week": 1627.99,
-            "seller_revenue_net_eur_week": 1627.99
+            "units_sold_week": 507,
+            "units_wasted_week": 567,
+            "seller_revenue_gross_eur_week": 846.54,
+            "seller_revenue_net_eur_week": 846.54
           },
           "C": {
             "units_supplied_per_be": 12.785714,
@@ -1090,6 +1168,10 @@
             "seller_revenue_gross_eur_week": 2321.5,
             "seller_revenue_net_eur_week": 2228.64
           }
+        },
+        "attention": {
+          "walk_by_p": 0.1,
+          "open_p": 0.25
         }
       }
     ],
@@ -1225,66 +1307,66 @@
         },
         "units_sold_per_be": {
           "n": 20,
-          "mean": 12.608929,
-          "sd": 0.720599,
-          "ci95_low": 12.271682,
-          "ci95_high": 12.946176,
-          "drop_one_min": 12.556391,
-          "drop_one_max": 12.68797
+          "mean": 6.114286,
+          "sd": 0.286559,
+          "ci95_low": 5.980174,
+          "ci95_high": 6.248398,
+          "drop_one_min": 6.088346,
+          "drop_one_max": 6.140978
         },
         "units_wasted_per_be": {
           "n": 20,
-          "mean": 1.057143,
-          "sd": 0.128369,
-          "ci95_low": 0.997065,
-          "ci95_high": 1.117221,
-          "drop_one_min": 1.045739,
-          "drop_one_max": 1.073308
+          "mean": 7.551786,
+          "sd": 0.786495,
+          "ci95_low": 7.183699,
+          "ci95_high": 7.919872,
+          "drop_one_min": 7.498747,
+          "drop_one_max": 7.656015
         },
         "seller_revenue_gross_eur_per_be": {
           "n": 20,
-          "mean": 19.051417,
-          "sd": 1.230106,
-          "ci95_low": 18.475716,
-          "ci95_high": 19.627117,
-          "drop_one_min": 18.936241,
-          "drop_one_max": 19.182293
+          "mean": 9.225518,
+          "sd": 0.452559,
+          "ci95_low": 9.013716,
+          "ci95_high": 9.43732,
+          "drop_one_min": 9.180658,
+          "drop_one_max": 9.269599
         },
         "seller_revenue_net_eur_per_be": {
           "n": 20,
-          "mean": 19.051417,
-          "sd": 1.230106,
-          "ci95_low": 18.475716,
-          "ci95_high": 19.627117,
-          "drop_one_min": 18.936241,
-          "drop_one_max": 19.182293
+          "mean": 9.225518,
+          "sd": 0.452559,
+          "ci95_low": 9.013716,
+          "ci95_high": 9.43732,
+          "drop_one_min": 9.180658,
+          "drop_one_max": 9.269599
         },
         "mean_price_paid_eur": {
           "n": 20,
-          "mean": 1.511479,
-          "sd": 0.060899,
-          "ci95_low": 1.482978,
-          "ci95_high": 1.539981,
-          "drop_one_min": 1.504219,
-          "drop_one_max": 1.517441
+          "mean": 1.509934,
+          "sd": 0.062828,
+          "ci95_low": 1.48053,
+          "ci95_high": 1.539338,
+          "drop_one_min": 1.501525,
+          "drop_one_max": 1.51533
         },
         "mean_buyer_surplus_eur": {
           "n": 20,
-          "mean": 1.424631,
-          "sd": 0.064229,
-          "ci95_low": 1.394571,
-          "ci95_high": 1.454691,
-          "drop_one_min": 1.416156,
-          "drop_one_max": 1.430403
+          "mean": 1.432044,
+          "sd": 0.083421,
+          "ci95_low": 1.393003,
+          "ci95_high": 1.471086,
+          "drop_one_min": 1.424246,
+          "drop_one_max": 1.438966
         },
         "share_holders_served": {
           "n": 20,
-          "mean": 0.738,
-          "sd": 0.03163,
-          "ci95_low": 0.723197,
-          "ci95_high": 0.752803,
-          "drop_one_min": 0.734912,
-          "drop_one_max": 0.741228
+          "mean": 0.570667,
+          "sd": 0.026745,
+          "ci95_low": 0.55815,
+          "ci95_high": 0.583184,
+          "drop_one_min": 0.568246,
+          "drop_one_max": 0.573158
         },
         "units_supplied_week": {
           "n": 20,
@@ -1297,39 +1379,39 @@
         },
         "units_sold_week": {
           "n": 20,
-          "mean": 1059.15,
-          "sd": 60.530353,
-          "ci95_low": 1030.821248,
-          "ci95_high": 1087.478752,
-          "drop_one_min": 1054.736842,
-          "drop_one_max": 1065.789474
+          "mean": 513.6,
+          "sd": 24.070948,
+          "ci95_low": 502.334579,
+          "ci95_high": 524.865421,
+          "drop_one_min": 511.421053,
+          "drop_one_max": 515.842105
         },
         "units_wasted_week": {
           "n": 20,
-          "mean": 88.8,
-          "sd": 10.783028,
-          "ci95_low": 83.753446,
-          "ci95_high": 93.846554,
-          "drop_one_min": 87.842105,
-          "drop_one_max": 90.157895
+          "mean": 634.35,
+          "sd": 66.065577,
+          "ci95_low": 603.430713,
+          "ci95_high": 665.269287,
+          "drop_one_min": 629.894737,
+          "drop_one_max": 643.105263
         },
         "seller_revenue_gross_eur_week": {
           "n": 20,
-          "mean": 1600.319,
-          "sd": 103.328907,
-          "ci95_low": 1551.960139,
-          "ci95_high": 1648.677861,
-          "drop_one_min": 1590.644211,
-          "drop_one_max": 1611.312632
+          "mean": 774.9435,
+          "sd": 38.014968,
+          "ci95_low": 757.152152,
+          "ci95_high": 792.734848,
+          "drop_one_min": 771.175263,
+          "drop_one_max": 778.646316
         },
         "seller_revenue_net_eur_week": {
           "n": 20,
-          "mean": 1600.319,
-          "sd": 103.328907,
-          "ci95_low": 1551.960139,
-          "ci95_high": 1648.677861,
-          "drop_one_min": 1590.644211,
-          "drop_one_max": 1611.312632
+          "mean": 774.9435,
+          "sd": 38.014968,
+          "ci95_low": 757.152152,
+          "ci95_high": 792.734848,
+          "drop_one_min": 771.175263,
+          "drop_one_max": 778.646316
         }
       },
       "C": {
@@ -1601,66 +1683,66 @@
           },
           "units_sold_per_be": {
             "n": 10,
-            "mean": 5.821429,
-            "sd": 0.324282,
-            "ci95_low": 5.589467,
-            "ci95_high": 6.05339,
-            "drop_one_min": 5.765873,
-            "drop_one_max": 5.896826
+            "mean": 2.128572,
+            "sd": 0.128439,
+            "ci95_low": 2.036698,
+            "ci95_high": 2.220445,
+            "drop_one_min": 2.111111,
+            "drop_one_max": 2.146825
           },
           "units_wasted_per_be": {
             "n": 10,
-            "mean": 8.010714,
-            "sd": 0.949325,
-            "ci95_low": 7.331655,
-            "ci95_high": 8.689773,
-            "drop_one_min": 7.873016,
-            "drop_one_max": 8.238095
+            "mean": 11.703571,
+            "sd": 0.947631,
+            "ci95_low": 11.025724,
+            "ci95_high": 12.381419,
+            "drop_one_min": 11.596561,
+            "drop_one_max": 11.920635
           },
           "seller_revenue_gross_eur_per_be": {
             "n": 10,
-            "mean": 8.684857,
-            "sd": 0.71321,
-            "ci95_low": 8.174693,
-            "ci95_high": 9.195022,
-            "drop_one_min": 8.520516,
-            "drop_one_max": 8.818545
+            "mean": 3.16919,
+            "sd": 0.228697,
+            "ci95_low": 3.005602,
+            "ci95_high": 3.332779,
+            "drop_one_min": 3.117077,
+            "drop_one_max": 3.19
           },
           "seller_revenue_net_eur_per_be": {
             "n": 10,
-            "mean": 8.684857,
-            "sd": 0.71321,
-            "ci95_low": 8.174693,
-            "ci95_high": 9.195022,
-            "drop_one_min": 8.520516,
-            "drop_one_max": 8.818545
+            "mean": 3.16919,
+            "sd": 0.228697,
+            "ci95_low": 3.005602,
+            "ci95_high": 3.332779,
+            "drop_one_min": 3.117077,
+            "drop_one_max": 3.19
           },
           "mean_price_paid_eur": {
             "n": 10,
-            "mean": 1.490679,
-            "sd": 0.061034,
-            "ci95_low": 1.447021,
-            "ci95_high": 1.534338,
-            "drop_one_min": 1.47766,
-            "drop_one_max": 1.500192
+            "mean": 1.489348,
+            "sd": 0.067442,
+            "ci95_low": 1.441105,
+            "ci95_high": 1.53759,
+            "drop_one_min": 1.475166,
+            "drop_one_max": 1.501462
           },
           "mean_buyer_surplus_eur": {
             "n": 10,
-            "mean": 1.449175,
-            "sd": 0.128325,
-            "ci95_low": 1.357382,
-            "ci95_high": 1.540967,
-            "drop_one_min": 1.423854,
-            "drop_one_max": 1.474004
+            "mean": 1.495352,
+            "sd": 0.14191,
+            "ci95_low": 1.393843,
+            "ci95_high": 1.596861,
+            "drop_one_min": 1.468929,
+            "drop_one_max": 1.517552
           },
           "share_holders_served": {
             "n": 10,
-            "mean": 0.876,
-            "sd": 0.032042,
-            "ci95_low": 0.85308,
-            "ci95_high": 0.89892,
-            "drop_one_min": 0.871111,
-            "drop_one_max": 0.883333
+            "mean": 0.596,
+            "sd": 0.035963,
+            "ci95_low": 0.570275,
+            "ci95_high": 0.621725,
+            "drop_one_min": 0.591111,
+            "drop_one_max": 0.601111
           },
           "units_supplied_week": {
             "n": 10,
@@ -1673,39 +1755,39 @@
           },
           "units_sold_week": {
             "n": 10,
-            "mean": 489.0,
-            "sd": 27.239677,
-            "ci95_low": 469.515263,
-            "ci95_high": 508.484737,
-            "drop_one_min": 484.333333,
-            "drop_one_max": 495.333333
+            "mean": 178.8,
+            "sd": 10.788883,
+            "ci95_low": 171.082634,
+            "ci95_high": 186.517366,
+            "drop_one_min": 177.333333,
+            "drop_one_max": 180.333333
           },
           "units_wasted_week": {
             "n": 10,
-            "mean": 672.9,
-            "sd": 79.743269,
-            "ci95_low": 615.859065,
-            "ci95_high": 729.940935,
-            "drop_one_min": 661.333333,
-            "drop_one_max": 692.0
+            "mean": 983.1,
+            "sd": 79.601019,
+            "ci95_low": 926.160817,
+            "ci95_high": 1040.039183,
+            "drop_one_min": 974.111111,
+            "drop_one_max": 1001.333333
           },
           "seller_revenue_gross_eur_week": {
             "n": 10,
-            "mean": 729.528,
-            "sd": 59.909638,
-            "ci95_low": 686.674204,
-            "ci95_high": 772.381796,
-            "drop_one_min": 715.723333,
-            "drop_one_max": 740.757778
+            "mean": 266.212,
+            "sd": 19.210538,
+            "ci95_low": 252.470564,
+            "ci95_high": 279.953436,
+            "drop_one_min": 261.834444,
+            "drop_one_max": 267.96
           },
           "seller_revenue_net_eur_week": {
             "n": 10,
-            "mean": 729.528,
-            "sd": 59.909638,
-            "ci95_low": 686.674204,
-            "ci95_high": 772.381796,
-            "drop_one_min": 715.723333,
-            "drop_one_max": 740.757778
+            "mean": 266.212,
+            "sd": 19.210538,
+            "ci95_low": 252.470564,
+            "ci95_high": 279.953436,
+            "drop_one_min": 261.834444,
+            "drop_one_max": 267.96
           }
         },
         "C": {
@@ -1976,66 +2058,66 @@
           },
           "units_sold_per_be": {
             "n": 10,
-            "mean": 10.825,
-            "sd": 0.590805,
-            "ci95_low": 10.402393,
-            "ci95_high": 11.247607,
-            "drop_one_min": 10.742064,
-            "drop_one_max": 10.940476
+            "mean": 4.203571,
+            "sd": 0.178214,
+            "ci95_low": 4.076094,
+            "ci95_high": 4.331049,
+            "drop_one_min": 4.170635,
+            "drop_one_max": 4.230159
           },
           "units_wasted_per_be": {
             "n": 10,
-            "mean": 3.007143,
-            "sd": 0.540825,
-            "ci95_low": 2.620287,
-            "ci95_high": 3.393999,
-            "drop_one_min": 2.929894,
-            "drop_one_max": 3.142857
+            "mean": 9.628571,
+            "sd": 0.950292,
+            "ci95_low": 8.948821,
+            "ci95_high": 10.308322,
+            "drop_one_min": 9.537037,
+            "drop_one_max": 9.861111
           },
           "seller_revenue_gross_eur_per_be": {
             "n": 10,
-            "mean": 16.22781,
-            "sd": 1.096152,
-            "ci95_low": 15.443724,
-            "ci95_high": 17.011895,
-            "drop_one_min": 16.096521,
-            "drop_one_max": 16.424405
+            "mean": 6.302869,
+            "sd": 0.340583,
+            "ci95_low": 6.059247,
+            "ci95_high": 6.546491,
+            "drop_one_min": 6.261481,
+            "drop_one_max": 6.382513
           },
           "seller_revenue_net_eur_per_be": {
             "n": 10,
-            "mean": 16.22781,
-            "sd": 1.096152,
-            "ci95_low": 15.443724,
-            "ci95_high": 17.011895,
-            "drop_one_min": 16.096521,
-            "drop_one_max": 16.424405
+            "mean": 6.302869,
+            "sd": 0.340583,
+            "ci95_low": 6.059247,
+            "ci95_high": 6.546491,
+            "drop_one_min": 6.261481,
+            "drop_one_max": 6.382513
           },
           "mean_price_paid_eur": {
             "n": 10,
-            "mean": 1.498922,
-            "sd": 0.05596,
-            "ci95_low": 1.458894,
-            "ci95_high": 1.538951,
-            "drop_one_min": 1.489272,
-            "drop_one_max": 1.509282
+            "mean": 1.499582,
+            "sd": 0.058374,
+            "ci95_low": 1.457827,
+            "ci95_high": 1.541338,
+            "drop_one_min": 1.486394,
+            "drop_one_max": 1.509636
           },
           "mean_buyer_surplus_eur": {
             "n": 10,
-            "mean": 1.440734,
-            "sd": 0.08394,
-            "ci95_low": 1.380691,
-            "ci95_high": 1.500776,
-            "drop_one_min": 1.424789,
-            "drop_one_max": 1.452174
+            "mean": 1.45145,
+            "sd": 0.110664,
+            "ci95_low": 1.372291,
+            "ci95_high": 1.530609,
+            "drop_one_min": 1.431247,
+            "drop_one_max": 1.467768
           },
           "share_holders_served": {
             "n": 10,
-            "mean": 0.8335,
-            "sd": 0.027993,
-            "ci95_low": 0.813476,
-            "ci95_high": 0.853524,
-            "drop_one_min": 0.826667,
-            "drop_one_max": 0.837778
+            "mean": 0.5885,
+            "sd": 0.02495,
+            "ci95_low": 0.570653,
+            "ci95_high": 0.606347,
+            "drop_one_min": 0.583889,
+            "drop_one_max": 0.592222
           },
           "units_supplied_week": {
             "n": 10,
@@ -2048,39 +2130,39 @@
           },
           "units_sold_week": {
             "n": 10,
-            "mean": 909.3,
-            "sd": 49.627613,
-            "ci95_low": 873.801011,
-            "ci95_high": 944.798989,
-            "drop_one_min": 902.333333,
-            "drop_one_max": 919.0
+            "mean": 353.1,
+            "sd": 14.96997,
+            "ci95_low": 342.391873,
+            "ci95_high": 363.808127,
+            "drop_one_min": 350.333333,
+            "drop_one_max": 355.333333
           },
           "units_wasted_week": {
             "n": 10,
-            "mean": 252.6,
-            "sd": 45.42931,
-            "ci95_low": 220.104087,
-            "ci95_high": 285.095913,
-            "drop_one_min": 246.111111,
-            "drop_one_max": 264.0
+            "mean": 808.8,
+            "sd": 79.82453,
+            "ci95_low": 751.700939,
+            "ci95_high": 865.899061,
+            "drop_one_min": 801.111111,
+            "drop_one_max": 828.333333
           },
           "seller_revenue_gross_eur_week": {
             "n": 10,
-            "mean": 1363.136,
-            "sd": 92.076791,
-            "ci95_low": 1297.272808,
-            "ci95_high": 1428.999192,
-            "drop_one_min": 1352.107778,
-            "drop_one_max": 1379.65
+            "mean": 529.441,
+            "sd": 28.609,
+            "ci95_low": 508.976776,
+            "ci95_high": 549.905224,
+            "drop_one_min": 525.964444,
+            "drop_one_max": 536.131111
           },
           "seller_revenue_net_eur_week": {
             "n": 10,
-            "mean": 1363.136,
-            "sd": 92.076791,
-            "ci95_low": 1297.272808,
-            "ci95_high": 1428.999192,
-            "drop_one_min": 1352.107778,
-            "drop_one_max": 1379.65
+            "mean": 529.441,
+            "sd": 28.609,
+            "ci95_low": 508.976776,
+            "ci95_high": 549.905224,
+            "drop_one_min": 525.964444,
+            "drop_one_max": 536.131111
           }
         },
         "C": {
@@ -2351,66 +2433,66 @@
           },
           "units_sold_per_be": {
             "n": 10,
-            "mean": 12.764286,
-            "sd": 0.829618,
-            "ci95_low": 12.170854,
-            "ci95_high": 13.357717,
-            "drop_one_min": 12.670635,
-            "drop_one_max": 12.948413
+            "mean": 6.203572,
+            "sd": 0.215637,
+            "ci95_low": 6.049325,
+            "ci95_high": 6.357818,
+            "drop_one_min": 6.174603,
+            "drop_one_max": 6.246032
           },
           "units_wasted_per_be": {
             "n": 10,
-            "mean": 1.067857,
-            "sd": 0.124359,
-            "ci95_low": 0.978902,
-            "ci95_high": 1.156812,
-            "drop_one_min": 1.050264,
-            "drop_one_max": 1.088624
+            "mean": 7.628571,
+            "sd": 0.996305,
+            "ci95_low": 6.915907,
+            "ci95_high": 8.341236,
+            "drop_one_min": 7.525132,
+            "drop_one_max": 7.857143
           },
           "seller_revenue_gross_eur_per_be": {
             "n": 10,
-            "mean": 19.172131,
-            "sd": 1.529249,
-            "ci95_low": 18.078248,
-            "ci95_high": 20.266014,
-            "drop_one_min": 18.942394,
-            "drop_one_max": 19.461839
+            "mean": 9.291738,
+            "sd": 0.452825,
+            "ci95_low": 8.967829,
+            "ci95_high": 9.615647,
+            "drop_one_min": 9.212725,
+            "drop_one_max": 9.369127
           },
           "seller_revenue_net_eur_per_be": {
             "n": 10,
-            "mean": 19.172131,
-            "sd": 1.529249,
-            "ci95_low": 18.078248,
-            "ci95_high": 20.266014,
-            "drop_one_min": 18.942394,
-            "drop_one_max": 19.461839
+            "mean": 9.291738,
+            "sd": 0.452825,
+            "ci95_low": 8.967829,
+            "ci95_high": 9.615647,
+            "drop_one_min": 9.212725,
+            "drop_one_max": 9.369127
           },
           "mean_price_paid_eur": {
             "n": 10,
-            "mean": 1.501583,
-            "sd": 0.057026,
-            "ci95_low": 1.460791,
-            "ci95_high": 1.542374,
-            "drop_one_min": 1.492948,
-            "drop_one_max": 1.513069
+            "mean": 1.497938,
+            "sd": 0.055617,
+            "ci95_low": 1.458155,
+            "ci95_high": 1.537721,
+            "drop_one_min": 1.486547,
+            "drop_one_max": 1.507997
           },
           "mean_buyer_surplus_eur": {
             "n": 10,
-            "mean": 1.446625,
-            "sd": 0.043925,
-            "ci95_low": 1.415205,
-            "ci95_high": 1.478045,
-            "drop_one_min": 1.441052,
-            "drop_one_max": 1.455688
+            "mean": 1.459123,
+            "sd": 0.086336,
+            "ci95_low": 1.397366,
+            "ci95_high": 1.52088,
+            "drop_one_min": 1.44827,
+            "drop_one_max": 1.475368
           },
           "share_holders_served": {
             "n": 10,
-            "mean": 0.751667,
-            "sd": 0.034792,
-            "ci95_low": 0.72678,
-            "ci95_high": 0.776554,
-            "drop_one_min": 0.746667,
-            "drop_one_max": 0.757778
+            "mean": 0.579,
+            "sd": 0.020126,
+            "ci95_low": 0.564604,
+            "ci95_high": 0.593396,
+            "drop_one_min": 0.576296,
+            "drop_one_max": 0.582963
           },
           "units_supplied_week": {
             "n": 10,
@@ -2423,39 +2505,39 @@
           },
           "units_sold_week": {
             "n": 10,
-            "mean": 1072.2,
-            "sd": 69.687876,
-            "ci95_low": 1022.35176,
-            "ci95_high": 1122.04824,
-            "drop_one_min": 1064.333333,
-            "drop_one_max": 1087.666667
+            "mean": 521.1,
+            "sd": 18.113531,
+            "ci95_low": 508.143261,
+            "ci95_high": 534.056739,
+            "drop_one_min": 518.666667,
+            "drop_one_max": 524.666667
           },
           "units_wasted_week": {
             "n": 10,
-            "mean": 89.7,
-            "sd": 10.446158,
-            "ci95_low": 82.227788,
-            "ci95_high": 97.172212,
-            "drop_one_min": 88.222222,
-            "drop_one_max": 91.444444
+            "mean": 640.8,
+            "sd": 83.689638,
+            "ci95_low": 580.936199,
+            "ci95_high": 700.663801,
+            "drop_one_min": 632.111111,
+            "drop_one_max": 660.0
           },
           "seller_revenue_gross_eur_week": {
             "n": 10,
-            "mean": 1610.459,
-            "sd": 128.456913,
-            "ci95_low": 1518.572845,
-            "ci95_high": 1702.345155,
-            "drop_one_min": 1591.161111,
-            "drop_one_max": 1634.794444
+            "mean": 780.506,
+            "sd": 38.037312,
+            "ci95_low": 753.297637,
+            "ci95_high": 807.714363,
+            "drop_one_min": 773.868889,
+            "drop_one_max": 787.006667
           },
           "seller_revenue_net_eur_week": {
             "n": 10,
-            "mean": 1610.459,
-            "sd": 128.456913,
-            "ci95_low": 1518.572845,
-            "ci95_high": 1702.345155,
-            "drop_one_min": 1591.161111,
-            "drop_one_max": 1634.794444
+            "mean": 780.506,
+            "sd": 38.037312,
+            "ci95_low": 753.297637,
+            "ci95_high": 807.714363,
+            "drop_one_min": 773.868889,
+            "drop_one_max": 787.006667
           }
         },
         "C": {
@@ -2726,66 +2808,66 @@
           },
           "units_sold_per_be": {
             "n": 10,
-            "mean": 12.857143,
-            "sd": 0.903351,
-            "ci95_low": 12.210969,
-            "ci95_high": 13.503316,
-            "drop_one_min": 12.742064,
-            "drop_one_max": 13.051587
+            "mean": 9.875,
+            "sd": 0.305955,
+            "ci95_low": 9.656148,
+            "ci95_high": 10.093852,
+            "drop_one_min": 9.833333,
+            "drop_one_max": 9.93254
           },
           "units_wasted_per_be": {
             "n": 10,
-            "mean": 0.975,
-            "sd": 0.110607,
-            "ci95_low": 0.895882,
-            "ci95_high": 1.054118,
-            "drop_one_min": 0.952381,
-            "drop_one_max": 0.989418
+            "mean": 3.957143,
+            "sd": 0.688608,
+            "ci95_low": 3.464576,
+            "ci95_high": 4.449709,
+            "drop_one_min": 3.858466,
+            "drop_one_max": 4.099206
           },
           "seller_revenue_gross_eur_per_be": {
             "n": 10,
-            "mean": 19.295512,
-            "sd": 1.591558,
-            "ci95_low": 18.157059,
-            "ci95_high": 20.433965,
-            "drop_one_min": 19.06164,
-            "drop_one_max": 19.598929
+            "mean": 14.813333,
+            "sd": 0.858429,
+            "ci95_low": 14.199293,
+            "ci95_high": 15.427374,
+            "drop_one_min": 14.693796,
+            "drop_one_max": 14.948281
           },
           "seller_revenue_net_eur_per_be": {
             "n": 10,
-            "mean": 19.295512,
-            "sd": 1.591558,
-            "ci95_low": 18.157059,
-            "ci95_high": 20.433965,
-            "drop_one_min": 19.06164,
-            "drop_one_max": 19.598929
+            "mean": 14.813333,
+            "sd": 0.858429,
+            "ci95_low": 14.199293,
+            "ci95_high": 15.427374,
+            "drop_one_min": 14.693796,
+            "drop_one_max": 14.948281
           },
           "mean_price_paid_eur": {
             "n": 10,
-            "mean": 1.500538,
-            "sd": 0.05755,
-            "ci95_low": 1.459372,
-            "ci95_high": 1.541703,
-            "drop_one_min": 1.491787,
-            "drop_one_max": 1.511953
+            "mean": 1.499426,
+            "sd": 0.05668,
+            "ci95_low": 1.458883,
+            "ci95_high": 1.53997,
+            "drop_one_min": 1.489106,
+            "drop_one_max": 1.509914
           },
           "mean_buyer_surplus_eur": {
             "n": 10,
-            "mean": 1.433901,
-            "sd": 0.061262,
-            "ci95_low": 1.39008,
-            "ci95_high": 1.477722,
-            "drop_one_min": 1.425038,
-            "drop_one_max": 1.446153
+            "mean": 1.458922,
+            "sd": 0.069979,
+            "ci95_low": 1.408865,
+            "ci95_high": 1.508979,
+            "drop_one_min": 1.440396,
+            "drop_one_max": 1.467968
           },
           "share_holders_served": {
             "n": 10,
-            "mean": 0.5376,
-            "sd": 0.032616,
-            "ci95_low": 0.514269,
-            "ci95_high": 0.560931,
-            "drop_one_min": 0.531333,
-            "drop_one_max": 0.544
+            "mean": 0.553,
+            "sd": 0.017133,
+            "ci95_low": 0.540744,
+            "ci95_high": 0.565256,
+            "drop_one_min": 0.550667,
+            "drop_one_max": 0.556222
           },
           "units_supplied_week": {
             "n": 10,
@@ -2798,39 +2880,39 @@
           },
           "units_sold_week": {
             "n": 10,
-            "mean": 1080.0,
-            "sd": 75.881487,
-            "ci95_low": 1025.721426,
-            "ci95_high": 1134.278574,
-            "drop_one_min": 1070.333333,
-            "drop_one_max": 1096.333333
+            "mean": 829.5,
+            "sd": 25.700195,
+            "ci95_low": 811.116466,
+            "ci95_high": 847.883534,
+            "drop_one_min": 826.0,
+            "drop_one_max": 834.333333
           },
           "units_wasted_week": {
             "n": 10,
-            "mean": 81.9,
-            "sd": 9.290975,
-            "ci95_low": 75.254098,
-            "ci95_high": 88.545902,
-            "drop_one_min": 80.0,
-            "drop_one_max": 83.111111
+            "mean": 332.4,
+            "sd": 57.843083,
+            "ci95_low": 291.024426,
+            "ci95_high": 373.775574,
+            "drop_one_min": 324.111111,
+            "drop_one_max": 344.333333
           },
           "seller_revenue_gross_eur_week": {
             "n": 10,
-            "mean": 1620.823,
-            "sd": 133.690883,
-            "ci95_low": 1525.192948,
-            "ci95_high": 1716.453052,
-            "drop_one_min": 1601.177778,
-            "drop_one_max": 1646.31
+            "mean": 1244.32,
+            "sd": 72.108021,
+            "ci95_low": 1192.740613,
+            "ci95_high": 1295.899387,
+            "drop_one_min": 1234.278889,
+            "drop_one_max": 1255.655556
           },
           "seller_revenue_net_eur_week": {
             "n": 10,
-            "mean": 1620.823,
-            "sd": 133.690883,
-            "ci95_low": 1525.192948,
-            "ci95_high": 1716.453052,
-            "drop_one_min": 1601.177778,
-            "drop_one_max": 1646.31
+            "mean": 1244.32,
+            "sd": 72.108021,
+            "ci95_low": 1192.740613,
+            "ci95_high": 1295.899387,
+            "drop_one_min": 1234.278889,
+            "drop_one_max": 1255.655556
           }
         },
         "C": {
@@ -2951,6 +3033,744 @@
             "drop_one_min": 3204.936533,
             "drop_one_max": 3260.989867
           }
+        }
+      }
+    }
+  },
+  "attention_parity": {
+    "label": "simulated",
+    "description": "Attention parity: A's walk-by probability and B's app-open probability are set to 1.0, so every wish-holder in radius considers every shop every evening. C is unchanged. main_run_same_seeds is the headline run over the same seeds, for comparison.",
+    "adoption": 0.03,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "walk_by_p": 1.0,
+    "open_p": 1.0,
+    "n_holders": 300,
+    "summary": {
+      "A": {
+        "units_supplied_per_be": {
+          "n": 10,
+          "mean": 13.832143,
+          "sd": 0.892962,
+          "ci95_low": 13.193401,
+          "ci95_high": 14.470885,
+          "drop_one_min": 13.722222,
+          "drop_one_max": 14.031746
+        },
+        "units_sold_per_be": {
+          "n": 10,
+          "mean": 9.416667,
+          "sd": 0.261604,
+          "ci95_low": 9.22954,
+          "ci95_high": 9.603794,
+          "drop_one_min": 9.37963,
+          "drop_one_max": 9.472222
+        },
+        "units_wasted_per_be": {
+          "n": 10,
+          "mean": 4.415476,
+          "sd": 0.830692,
+          "ci95_low": 3.821276,
+          "ci95_high": 5.009676,
+          "drop_one_min": 4.316137,
+          "drop_one_max": 4.588624
+        },
+        "seller_revenue_gross_eur_per_be": {
+          "n": 10,
+          "mean": 20.863345,
+          "sd": 0.630246,
+          "ci95_low": 20.412526,
+          "ci95_high": 21.314164,
+          "drop_one_min": 20.766376,
+          "drop_one_max": 20.967765
+        },
+        "seller_revenue_net_eur_per_be": {
+          "n": 10,
+          "mean": 20.863345,
+          "sd": 0.630246,
+          "ci95_low": 20.412526,
+          "ci95_high": 21.314164,
+          "drop_one_min": 20.766376,
+          "drop_one_max": 20.967765
+        },
+        "mean_price_paid_eur": {
+          "n": 10,
+          "mean": 2.216636,
+          "sd": 0.076592,
+          "ci95_low": 2.161849,
+          "ci95_high": 2.271423,
+          "drop_one_min": 2.204039,
+          "drop_one_max": 2.231115
+        },
+        "mean_buyer_surplus_eur": {
+          "n": 10,
+          "mean": 0.886321,
+          "sd": 0.059321,
+          "ci95_low": 0.843888,
+          "ci95_high": 0.928754,
+          "drop_one_min": 0.87672,
+          "drop_one_max": 0.897404
+        },
+        "share_holders_served": {
+          "n": 10,
+          "mean": 0.89,
+          "sd": 0.024545,
+          "ci95_low": 0.872443,
+          "ci95_high": 0.907557,
+          "drop_one_min": 0.884444,
+          "drop_one_max": 0.894444
+        },
+        "units_supplied_week": {
+          "n": 10,
+          "mean": 1161.9,
+          "sd": 75.008814,
+          "ci95_low": 1108.245655,
+          "ci95_high": 1215.554345,
+          "drop_one_min": 1152.666667,
+          "drop_one_max": 1178.666667
+        },
+        "units_sold_week": {
+          "n": 10,
+          "mean": 791.0,
+          "sd": 21.974733,
+          "ci95_low": 775.281315,
+          "ci95_high": 806.718685,
+          "drop_one_min": 787.888889,
+          "drop_one_max": 795.666667
+        },
+        "units_wasted_week": {
+          "n": 10,
+          "mean": 370.9,
+          "sd": 69.77814,
+          "ci95_low": 320.987193,
+          "ci95_high": 420.812807,
+          "drop_one_min": 362.555556,
+          "drop_one_max": 385.444444
+        },
+        "seller_revenue_gross_eur_week": {
+          "n": 10,
+          "mean": 1752.521,
+          "sd": 52.940629,
+          "ci95_low": 1714.652187,
+          "ci95_high": 1790.389813,
+          "drop_one_min": 1744.375556,
+          "drop_one_max": 1761.292222
+        },
+        "seller_revenue_net_eur_week": {
+          "n": 10,
+          "mean": 1752.521,
+          "sd": 52.940629,
+          "ci95_low": 1714.652187,
+          "ci95_high": 1790.389813,
+          "drop_one_min": 1744.375556,
+          "drop_one_max": 1761.292222
+        }
+      },
+      "B": {
+        "units_supplied_per_be": {
+          "n": 10,
+          "mean": 13.832143,
+          "sd": 0.892962,
+          "ci95_low": 13.193401,
+          "ci95_high": 14.470885,
+          "drop_one_min": 13.722222,
+          "drop_one_max": 14.031746
+        },
+        "units_sold_per_be": {
+          "n": 10,
+          "mean": 7.278571,
+          "sd": 0.197633,
+          "ci95_low": 7.137203,
+          "ci95_high": 7.41994,
+          "drop_one_min": 7.257936,
+          "drop_one_max": 7.31746
+        },
+        "units_wasted_per_be": {
+          "n": 10,
+          "mean": 6.553572,
+          "sd": 0.993749,
+          "ci95_low": 5.842736,
+          "ci95_high": 7.264407,
+          "drop_one_min": 6.445767,
+          "drop_one_max": 6.77381
+        },
+        "seller_revenue_gross_eur_per_be": {
+          "n": 10,
+          "mean": 10.934821,
+          "sd": 0.530796,
+          "ci95_low": 10.55514,
+          "ci95_high": 11.314503,
+          "drop_one_min": 10.845741,
+          "drop_one_max": 11.032421
+        },
+        "seller_revenue_net_eur_per_be": {
+          "n": 10,
+          "mean": 10.934821,
+          "sd": 0.530796,
+          "ci95_low": 10.55514,
+          "ci95_high": 11.314503,
+          "drop_one_min": 10.845741,
+          "drop_one_max": 11.032421
+        },
+        "mean_price_paid_eur": {
+          "n": 10,
+          "mean": 1.502127,
+          "sd": 0.054951,
+          "ci95_low": 1.462821,
+          "ci95_high": 1.541434,
+          "drop_one_min": 1.493484,
+          "drop_one_max": 1.513202
+        },
+        "mean_buyer_surplus_eur": {
+          "n": 10,
+          "mean": 1.456637,
+          "sd": 0.078744,
+          "ci95_low": 1.400311,
+          "ci95_high": 1.512963,
+          "drop_one_min": 1.442191,
+          "drop_one_max": 1.470635
+        },
+        "share_holders_served": {
+          "n": 10,
+          "mean": 0.679333,
+          "sd": 0.018446,
+          "ci95_low": 0.666139,
+          "ci95_high": 0.692528,
+          "drop_one_min": 0.677407,
+          "drop_one_max": 0.682963
+        },
+        "units_supplied_week": {
+          "n": 10,
+          "mean": 1161.9,
+          "sd": 75.008814,
+          "ci95_low": 1108.245655,
+          "ci95_high": 1215.554345,
+          "drop_one_min": 1152.666667,
+          "drop_one_max": 1178.666667
+        },
+        "units_sold_week": {
+          "n": 10,
+          "mean": 611.4,
+          "sd": 16.601205,
+          "ci95_low": 599.525039,
+          "ci95_high": 623.274961,
+          "drop_one_min": 609.666667,
+          "drop_one_max": 614.666667
+        },
+        "units_wasted_week": {
+          "n": 10,
+          "mean": 550.5,
+          "sd": 83.47488,
+          "ci95_low": 490.789817,
+          "ci95_high": 610.210183,
+          "drop_one_min": 541.444444,
+          "drop_one_max": 569.0
+        },
+        "seller_revenue_gross_eur_week": {
+          "n": 10,
+          "mean": 918.525,
+          "sd": 44.58684,
+          "ci95_low": 886.631712,
+          "ci95_high": 950.418288,
+          "drop_one_min": 911.042222,
+          "drop_one_max": 926.723333
+        },
+        "seller_revenue_net_eur_week": {
+          "n": 10,
+          "mean": 918.525,
+          "sd": 44.58684,
+          "ci95_low": 886.631712,
+          "ci95_high": 950.418288,
+          "drop_one_min": 911.042222,
+          "drop_one_max": 926.723333
+        }
+      },
+      "C": {
+        "units_supplied_per_be": {
+          "n": 10,
+          "mean": 13.832143,
+          "sd": 0.892962,
+          "ci95_low": 13.193401,
+          "ci95_high": 14.470885,
+          "drop_one_min": 13.722222,
+          "drop_one_max": 14.031746
+        },
+        "units_sold_per_be": {
+          "n": 10,
+          "mean": 9.776191,
+          "sd": 0.115394,
+          "ci95_low": 9.693649,
+          "ci95_high": 9.858732,
+          "drop_one_min": 9.761905,
+          "drop_one_max": 9.806878
+        },
+        "units_wasted_per_be": {
+          "n": 10,
+          "mean": 4.055952,
+          "sd": 0.820346,
+          "ci95_low": 3.469153,
+          "ci95_high": 4.642752,
+          "drop_one_min": 3.955026,
+          "drop_one_max": 4.224868
+        },
+        "seller_revenue_gross_eur_per_be": {
+          "n": 10,
+          "mean": 28.174917,
+          "sd": 0.6884,
+          "ci95_low": 27.682499,
+          "ci95_high": 28.667334,
+          "drop_one_min": 28.072064,
+          "drop_one_max": 28.284471
+        },
+        "seller_revenue_net_eur_per_be": {
+          "n": 10,
+          "mean": 27.04792,
+          "sd": 0.660864,
+          "ci95_low": 26.575199,
+          "ci95_high": 27.520641,
+          "drop_one_min": 26.949181,
+          "drop_one_max": 27.153092
+        },
+        "mean_price_paid_eur": {
+          "n": 10,
+          "mean": 2.881885,
+          "sd": 0.055689,
+          "ci95_low": 2.84205,
+          "ci95_high": 2.92172,
+          "drop_one_min": 2.872075,
+          "drop_one_max": 2.89204
+        },
+        "mean_buyer_surplus_eur": {
+          "n": 10,
+          "mean": 0.071054,
+          "sd": 0.015305,
+          "ci95_low": 0.060106,
+          "ci95_high": 0.082001,
+          "drop_one_min": 0.067711,
+          "drop_one_max": 0.073791
+        },
+        "share_holders_served": {
+          "n": 10,
+          "mean": 0.998,
+          "sd": 0.002331,
+          "ci95_low": 0.996333,
+          "ci95_high": 0.999667,
+          "drop_one_min": 0.997778,
+          "drop_one_max": 0.998519
+        },
+        "units_supplied_week": {
+          "n": 10,
+          "mean": 1161.9,
+          "sd": 75.008814,
+          "ci95_low": 1108.245655,
+          "ci95_high": 1215.554345,
+          "drop_one_min": 1152.666667,
+          "drop_one_max": 1178.666667
+        },
+        "units_sold_week": {
+          "n": 10,
+          "mean": 821.2,
+          "sd": 9.693067,
+          "ci95_low": 814.266479,
+          "ci95_high": 828.133521,
+          "drop_one_min": 820.0,
+          "drop_one_max": 823.777778
+        },
+        "units_wasted_week": {
+          "n": 10,
+          "mean": 340.7,
+          "sd": 68.909038,
+          "ci95_low": 291.408868,
+          "ci95_high": 389.991132,
+          "drop_one_min": 332.222222,
+          "drop_one_max": 354.888889
+        },
+        "seller_revenue_gross_eur_week": {
+          "n": 10,
+          "mean": 2366.693,
+          "sd": 57.825598,
+          "ci95_low": 2325.329933,
+          "ci95_high": 2408.056067,
+          "drop_one_min": 2358.053333,
+          "drop_one_max": 2375.895556
+        },
+        "seller_revenue_net_eur_week": {
+          "n": 10,
+          "mean": 2272.02528,
+          "sd": 55.512574,
+          "ci95_low": 2232.316735,
+          "ci95_high": 2311.733825,
+          "drop_one_min": 2263.7312,
+          "drop_one_max": 2280.859733
+        }
+      }
+    },
+    "main_run_same_seeds": {
+      "A": {
+        "units_supplied_per_be": {
+          "n": 10,
+          "mean": 13.832143,
+          "sd": 0.892962,
+          "ci95_low": 13.193401,
+          "ci95_high": 14.470885,
+          "drop_one_min": 13.722222,
+          "drop_one_max": 14.031746
+        },
+        "units_sold_per_be": {
+          "n": 10,
+          "mean": 7.026191,
+          "sd": 0.309106,
+          "ci95_low": 6.805084,
+          "ci95_high": 7.247297,
+          "drop_one_min": 6.98545,
+          "drop_one_max": 7.088624
+        },
+        "units_wasted_per_be": {
+          "n": 10,
+          "mean": 6.805952,
+          "sd": 0.942476,
+          "ci95_low": 6.131793,
+          "ci95_high": 7.480112,
+          "drop_one_min": 6.694444,
+          "drop_one_max": 7.030423
+        },
+        "seller_revenue_gross_eur_per_be": {
+          "n": 10,
+          "mean": 15.493095,
+          "sd": 0.394444,
+          "ci95_low": 15.210946,
+          "ci95_high": 15.775244,
+          "drop_one_min": 15.438492,
+          "drop_one_max": 15.579127
+        },
+        "seller_revenue_net_eur_per_be": {
+          "n": 10,
+          "mean": 15.493095,
+          "sd": 0.394444,
+          "ci95_low": 15.210946,
+          "ci95_high": 15.775244,
+          "drop_one_min": 15.438492,
+          "drop_one_max": 15.579127
+        },
+        "mean_price_paid_eur": {
+          "n": 10,
+          "mean": 2.207582,
+          "sd": 0.078006,
+          "ci95_low": 2.151784,
+          "ci95_high": 2.26338,
+          "drop_one_min": 2.192449,
+          "drop_one_max": 2.221429
+        },
+        "mean_buyer_surplus_eur": {
+          "n": 10,
+          "mean": 0.985521,
+          "sd": 0.05279,
+          "ci95_low": 0.94776,
+          "ci95_high": 1.023282,
+          "drop_one_min": 0.976129,
+          "drop_one_max": 0.994879
+        },
+        "share_holders_served": {
+          "n": 10,
+          "mean": 0.801333,
+          "sd": 0.030599,
+          "ci95_low": 0.779446,
+          "ci95_high": 0.823221,
+          "drop_one_min": 0.796296,
+          "drop_one_max": 0.807037
+        },
+        "units_supplied_week": {
+          "n": 10,
+          "mean": 1161.9,
+          "sd": 75.008814,
+          "ci95_low": 1108.245655,
+          "ci95_high": 1215.554345,
+          "drop_one_min": 1152.666667,
+          "drop_one_max": 1178.666667
+        },
+        "units_sold_week": {
+          "n": 10,
+          "mean": 590.2,
+          "sd": 25.964934,
+          "ci95_low": 571.627096,
+          "ci95_high": 608.772904,
+          "drop_one_min": 586.777778,
+          "drop_one_max": 595.444444
+        },
+        "units_wasted_week": {
+          "n": 10,
+          "mean": 571.7,
+          "sd": 79.167965,
+          "ci95_low": 515.070584,
+          "ci95_high": 628.329416,
+          "drop_one_min": 562.333333,
+          "drop_one_max": 590.555556
+        },
+        "seller_revenue_gross_eur_week": {
+          "n": 10,
+          "mean": 1301.42,
+          "sd": 33.133331,
+          "ci95_low": 1277.71949,
+          "ci95_high": 1325.12051,
+          "drop_one_min": 1296.833333,
+          "drop_one_max": 1308.646667
+        },
+        "seller_revenue_net_eur_week": {
+          "n": 10,
+          "mean": 1301.42,
+          "sd": 33.133331,
+          "ci95_low": 1277.71949,
+          "ci95_high": 1325.12051,
+          "drop_one_min": 1296.833333,
+          "drop_one_max": 1308.646667
+        }
+      },
+      "B": {
+        "units_supplied_per_be": {
+          "n": 10,
+          "mean": 13.832143,
+          "sd": 0.892962,
+          "ci95_low": 13.193401,
+          "ci95_high": 14.470885,
+          "drop_one_min": 13.722222,
+          "drop_one_max": 14.031746
+        },
+        "units_sold_per_be": {
+          "n": 10,
+          "mean": 6.203572,
+          "sd": 0.215637,
+          "ci95_low": 6.049325,
+          "ci95_high": 6.357818,
+          "drop_one_min": 6.174603,
+          "drop_one_max": 6.246032
+        },
+        "units_wasted_per_be": {
+          "n": 10,
+          "mean": 7.628571,
+          "sd": 0.996305,
+          "ci95_low": 6.915907,
+          "ci95_high": 8.341236,
+          "drop_one_min": 7.525132,
+          "drop_one_max": 7.857143
+        },
+        "seller_revenue_gross_eur_per_be": {
+          "n": 10,
+          "mean": 9.291738,
+          "sd": 0.452825,
+          "ci95_low": 8.967829,
+          "ci95_high": 9.615647,
+          "drop_one_min": 9.212725,
+          "drop_one_max": 9.369127
+        },
+        "seller_revenue_net_eur_per_be": {
+          "n": 10,
+          "mean": 9.291738,
+          "sd": 0.452825,
+          "ci95_low": 8.967829,
+          "ci95_high": 9.615647,
+          "drop_one_min": 9.212725,
+          "drop_one_max": 9.369127
+        },
+        "mean_price_paid_eur": {
+          "n": 10,
+          "mean": 1.497938,
+          "sd": 0.055617,
+          "ci95_low": 1.458155,
+          "ci95_high": 1.537721,
+          "drop_one_min": 1.486547,
+          "drop_one_max": 1.507997
+        },
+        "mean_buyer_surplus_eur": {
+          "n": 10,
+          "mean": 1.459123,
+          "sd": 0.086336,
+          "ci95_low": 1.397366,
+          "ci95_high": 1.52088,
+          "drop_one_min": 1.44827,
+          "drop_one_max": 1.475368
+        },
+        "share_holders_served": {
+          "n": 10,
+          "mean": 0.579,
+          "sd": 0.020126,
+          "ci95_low": 0.564604,
+          "ci95_high": 0.593396,
+          "drop_one_min": 0.576296,
+          "drop_one_max": 0.582963
+        },
+        "units_supplied_week": {
+          "n": 10,
+          "mean": 1161.9,
+          "sd": 75.008814,
+          "ci95_low": 1108.245655,
+          "ci95_high": 1215.554345,
+          "drop_one_min": 1152.666667,
+          "drop_one_max": 1178.666667
+        },
+        "units_sold_week": {
+          "n": 10,
+          "mean": 521.1,
+          "sd": 18.113531,
+          "ci95_low": 508.143261,
+          "ci95_high": 534.056739,
+          "drop_one_min": 518.666667,
+          "drop_one_max": 524.666667
+        },
+        "units_wasted_week": {
+          "n": 10,
+          "mean": 640.8,
+          "sd": 83.689638,
+          "ci95_low": 580.936199,
+          "ci95_high": 700.663801,
+          "drop_one_min": 632.111111,
+          "drop_one_max": 660.0
+        },
+        "seller_revenue_gross_eur_week": {
+          "n": 10,
+          "mean": 780.506,
+          "sd": 38.037312,
+          "ci95_low": 753.297637,
+          "ci95_high": 807.714363,
+          "drop_one_min": 773.868889,
+          "drop_one_max": 787.006667
+        },
+        "seller_revenue_net_eur_week": {
+          "n": 10,
+          "mean": 780.506,
+          "sd": 38.037312,
+          "ci95_low": 753.297637,
+          "ci95_high": 807.714363,
+          "drop_one_min": 773.868889,
+          "drop_one_max": 787.006667
+        }
+      },
+      "C": {
+        "units_supplied_per_be": {
+          "n": 10,
+          "mean": 13.832143,
+          "sd": 0.892962,
+          "ci95_low": 13.193401,
+          "ci95_high": 14.470885,
+          "drop_one_min": 13.722222,
+          "drop_one_max": 14.031746
+        },
+        "units_sold_per_be": {
+          "n": 10,
+          "mean": 9.776191,
+          "sd": 0.115394,
+          "ci95_low": 9.693649,
+          "ci95_high": 9.858732,
+          "drop_one_min": 9.761905,
+          "drop_one_max": 9.806878
+        },
+        "units_wasted_per_be": {
+          "n": 10,
+          "mean": 4.055952,
+          "sd": 0.820346,
+          "ci95_low": 3.469153,
+          "ci95_high": 4.642752,
+          "drop_one_min": 3.955026,
+          "drop_one_max": 4.224868
+        },
+        "seller_revenue_gross_eur_per_be": {
+          "n": 10,
+          "mean": 28.174917,
+          "sd": 0.6884,
+          "ci95_low": 27.682499,
+          "ci95_high": 28.667334,
+          "drop_one_min": 28.072064,
+          "drop_one_max": 28.284471
+        },
+        "seller_revenue_net_eur_per_be": {
+          "n": 10,
+          "mean": 27.04792,
+          "sd": 0.660864,
+          "ci95_low": 26.575199,
+          "ci95_high": 27.520641,
+          "drop_one_min": 26.949181,
+          "drop_one_max": 27.153092
+        },
+        "mean_price_paid_eur": {
+          "n": 10,
+          "mean": 2.881885,
+          "sd": 0.055689,
+          "ci95_low": 2.84205,
+          "ci95_high": 2.92172,
+          "drop_one_min": 2.872075,
+          "drop_one_max": 2.89204
+        },
+        "mean_buyer_surplus_eur": {
+          "n": 10,
+          "mean": 0.071054,
+          "sd": 0.015305,
+          "ci95_low": 0.060106,
+          "ci95_high": 0.082001,
+          "drop_one_min": 0.067711,
+          "drop_one_max": 0.073791
+        },
+        "share_holders_served": {
+          "n": 10,
+          "mean": 0.998,
+          "sd": 0.002331,
+          "ci95_low": 0.996333,
+          "ci95_high": 0.999667,
+          "drop_one_min": 0.997778,
+          "drop_one_max": 0.998519
+        },
+        "units_supplied_week": {
+          "n": 10,
+          "mean": 1161.9,
+          "sd": 75.008814,
+          "ci95_low": 1108.245655,
+          "ci95_high": 1215.554345,
+          "drop_one_min": 1152.666667,
+          "drop_one_max": 1178.666667
+        },
+        "units_sold_week": {
+          "n": 10,
+          "mean": 821.2,
+          "sd": 9.693067,
+          "ci95_low": 814.266479,
+          "ci95_high": 828.133521,
+          "drop_one_min": 820.0,
+          "drop_one_max": 823.777778
+        },
+        "units_wasted_week": {
+          "n": 10,
+          "mean": 340.7,
+          "sd": 68.909038,
+          "ci95_low": 291.408868,
+          "ci95_high": 389.991132,
+          "drop_one_min": 332.222222,
+          "drop_one_max": 354.888889
+        },
+        "seller_revenue_gross_eur_week": {
+          "n": 10,
+          "mean": 2366.693,
+          "sd": 57.825598,
+          "ci95_low": 2325.329933,
+          "ci95_high": 2408.056067,
+          "drop_one_min": 2358.053333,
+          "drop_one_max": 2375.895556
+        },
+        "seller_revenue_net_eur_week": {
+          "n": 10,
+          "mean": 2272.02528,
+          "sd": 55.512574,
+          "ci95_low": 2232.316735,
+          "ci95_high": 2311.733825,
+          "drop_one_min": 2263.7312,
+          "drop_one_max": 2280.859733
         }
       }
     }

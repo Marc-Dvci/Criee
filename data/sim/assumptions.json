@@ -37,7 +37,7 @@
       "value": 0.35,
       "unit": "share of list price",
       "origin": "brief",
-      "rationale": "Recorded for reference. No metric uses it: leftovers are baked whatever the policy, and the clock floor (0.30 x list) sits below this cost."
+      "rationale": "Reported for reference only. Leftovers are sunk cost, so no decision and no metric uses it."
     },
     {
       "id": "leftover_lambda",
@@ -118,14 +118,14 @@
       "rationale": "Half of holders accept 1.5 km, a third 2.5 km and the rest 4 km, as given in the brief."
     },
     {
-      "id": "holder_max_matches_per_week",
+      "id": "holder_weekly_loaf_allowance",
       "value": [
         2,
         4
       ],
-      "unit": "matches, uniform integer",
+      "unit": "loaves per week, uniform integer",
       "origin": "brief",
-      "rationale": "Weekly cap per holder. Enforced in all three policies."
+      "rationale": "The brief's max_matches_per_week, read as a weekly loaf allowance. Enforced on the same basis in all three policies: A and C count loaves, and B counts the 3 loaves of a bag."
     },
     {
       "id": "holder_units",
@@ -216,11 +216,18 @@
       "rationale": "Holders who open the app are served in random order."
     },
     {
-      "id": "policy_B_loaf_per_match",
-      "value": "a bag is one weekly match",
+      "id": "policy_B_one_per_evening",
+      "value": "one bag per holder per evening",
       "unit": "rule",
       "origin": "added",
-      "rationale": "The weekly cap counts bags, so a holder can take up to 3 x max_matches loaves in B. This favours B on units."
+      "rationale": "A holder opens the app once an evening and buys at most one bag."
+    },
+    {
+      "id": "policy_B_weekly_allowance",
+      "value": "a bag uses 3 loaves of the weekly allowance",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "A holder with fewer than 3 loaves left in the week cannot buy a bag. A holder whose allowance is 2 can never buy one. The same loaf cap applies to A and C."
     },
     {
       "id": "policy_B_commission",
@@ -234,13 +241,12 @@
       "value": "criee.engine Market + run_until, in-memory signed ledger",
       "unit": "rule",
       "origin": "brief",
-      "rationale": "Policy C is the real clearing engine, not a re-implementation."
+      "rationale": "Policy C is the real clearing engine, not a re-implementation. Its weekly match cap counts loaves, because every match is one loaf."
     },
     {
       "id": "policy_C_clock",
       "value": {
         "start": "list price",
-        "floor": "0.30 x list",
         "open": "18:30",
         "close": "19:10",
         "clock_step_s": 60
@@ -248,6 +254,13 @@
       "unit": "EUR and time",
       "origin": "brief",
       "rationale": "Starts at list price, reaches the floor at 80 percent of the window (about 19:02), then holds it until 19:10."
+    },
+    {
+      "id": "policy_C_floor",
+      "value": 0.3,
+      "unit": "share of list price",
+      "origin": "brief",
+      "rationale": "Kept at 0.30 x list in every run. Leftovers are sunk cost, so the floor is not set from unit cost."
     },
     {
       "id": "policy_C_pickup_window",
@@ -297,6 +310,27 @@
       "unit": "share of gross revenue",
       "origin": "brief",
       "rationale": "Applied to policy C only. Policies A and B carry no fee in the model."
+    },
+    {
+      "id": "attention_parity_walk_by_p",
+      "value": 1.0,
+      "unit": "probability per holder per bakery in radius per evening",
+      "origin": "added",
+      "rationale": "Attention-parity run only: A's walk-by set to 1.0, so every holder in radius considers every shop every evening."
+    },
+    {
+      "id": "attention_parity_open_p",
+      "value": 1.0,
+      "unit": "probability per holder per evening",
+      "origin": "added",
+      "rationale": "Attention-parity run only: B's app-open set to 1.0. C is unchanged, which isolates how much of the gap comes from standing wishes being always present versus from the clearing rule."
+    },
+    {
+      "id": "attention_parity_seeds",
+      "value": 10,
+      "unit": "seeds at the default adoption",
+      "origin": "added",
+      "rationale": "Seeds 0..9 at 3% adoption, with the same worlds as the headline run for those seeds."
     },
     {
       "id": "seeds_headline",

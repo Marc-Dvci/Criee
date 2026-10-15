@@ -170,7 +170,8 @@ def readback(t: WishTerms, label: str, place: str) -> str:
             qual.append(ATTR_WORDS[c.attr][0 if c.value else 1])
         else:
             word, unit = INT_WORDS[c.attr]
-            qual.append(f"{word} {'at least' if c.op is Op.GTE else 'at most'} {c.value}{unit}".rstrip())
+            amount = f"{c.value / 1000:g} kg" if c.attr is Attr.WEIGHT_G and c.value >= 1000 else f"{c.value}{unit}"
+            qual.append(f"{word} {'at least' if c.op is Op.GTE else 'at most'} {amount}".rstrip())
     low = label.lower()
     qual = [q for q in qual if q.lower() not in low]
     cat_word = CATEGORY_WORDS[t.category]

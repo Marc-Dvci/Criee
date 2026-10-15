@@ -432,13 +432,17 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         raise HTTPException(404, "no open pickup with this code")
 
     @app.get("/api/advice")
-    async def advice(request: Request, category: Category, quantity: int = 10) -> dict:
+    async def advice(request: Request, category: Category, quantity: int = 10, sentence: bool = False) -> dict:
         acc = me(request, "seller")
         if not acc.shop:
             raise HTTPException(409, "set up your shop first")
         now = utcnow()
         d = demand_for(core.market, GeoPoint(lat=acc.shop["lat"], lon=acc.shop["lon"]), category, quantity, now)
-        text, source = await advise(core.ai, d, category.value.replace("_", " "), visitor=visitor_of(request))
+        if sentence:
+            text, source = await advise(core.ai, d, category.value.replace("_", " "), visitor=visitor_of(request))
+        else:
+            from ..ai.advisor import template
+            text, source = template(d, category.value.replace("_", " ")), "computed"
         return {"sentence": text, "source": source, "numbers": d.numbers(), "curve": d.curve, "hidden": d.hidden}
 
 

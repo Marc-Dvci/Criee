@@ -123,7 +123,7 @@ def ensure_demo_market(core, now: datetime | None = None) -> int:
         lid = core.list_lot(fid, terms, LotListing(name="Vegetable box 10 kg", name_fr="Colis de légumes 10 kg",
                                                    unit_label="box"), simulated=True)
         r = _rng(f"farm:{lid}")
-        for i in range(37):
+        for i in range(39):
             bid = _sim_account(core, f"Simulated box buyer {lid[-4:]}-{i + 1:02d}", ["buyer"])
             pl, where = _place(r)
             t = WishTerms(category=Category.GROCERY_BOX, limit_cents=r.randrange(2400, 2900, 50), units=1,

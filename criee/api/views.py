@@ -128,7 +128,16 @@ def wish_view(core: Core, wid: str, now: datetime) -> dict[str, Any]:
         if why is not None:
             reasons[why] += 1
     n, spent = mk.usage(wid, now)
-    return {"id": wid, "label": meta.get("label"), "readback": meta.get("readback"), "status": w.status,
+    commitments = []
+    for lot in mk.lots.values():
+        if lot.terms.mode is ClearingMode.THRESHOLD and mk.is_committed(lot, wid) and                 not any(mk.matches[m].fill.wish_id == wid for m in mk.by_lot.get(lot.id, [])):
+            listing = core.listings.get(lot.id)
+            commitments.append({"lot_id": lot.id, "name": listing.name if listing else "Group order",
+                                "shop": shop_of(core, lot.seller_id)["name"], "price": lot.terms.start_cents,
+                                "committed": sum(u for w2, u in lot.committed if mk.wishes[w2].status == "active"),
+                                "target": lot.terms.threshold_qty, "closes_at": iso(lot.terms.closes_at),
+                                "status": lot_status(core, lot.id, now)})
+    return {"commitments": commitments, "id": wid, "label": meta.get("label"), "readback": meta.get("readback"), "status": w.status,
             "terms": w.terms.model_dump(mode="json"), "terms_hash": meta.get("terms_hash"),
             "signature": {"kind": (meta.get("signature") or {}).get("kind"),
                           "credential_id": (meta.get("signature") or {}).get("credential_id")},

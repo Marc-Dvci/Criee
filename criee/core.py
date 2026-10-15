@@ -141,6 +141,7 @@ class Core:
         self.inflight: set[tuple[str, str]] = set()
         self._subs: set[asyncio.Queue] = set()
         self._wake = asyncio.Event()
+        self.public_base = cfg.public_url if cfg.public_url != "auto" else "http://localhost:8000"
         self._tasks: list[asyncio.Task] = []
         for ev in self.ledger.events():
             self._fold(ev)

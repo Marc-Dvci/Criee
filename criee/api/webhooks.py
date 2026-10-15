@@ -79,7 +79,7 @@ async def webhook(request: Request) -> dict:
 
 async def register_webhook(core: Core) -> None:
     try:
-        wid = await core.paypal.ensure_webhook(f"{core.cfg.public_url}/api/paypal/webhook", EVENTS)
+        wid = await core.paypal.ensure_webhook(f"{core.public_base}/api/paypal/webhook", EVENTS)
         core.ledger.kv_set("webhook_id", wid)
         log.info("PayPal webhook %s registered", wid)
     except Exception:

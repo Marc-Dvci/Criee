@@ -227,6 +227,8 @@ class PayPalClient:
         for wh in existing.body.get("webhooks", []):
             if wh.get("url") == url:
                 return wh["id"]
+            if wh.get("url", "").endswith("/api/paypal/webhook"):
+                await self.call("DELETE", f"/v1/notifications/webhooks/{wh['id']}")
         res = await self.call("POST", "/v1/notifications/webhooks",
                               {"url": url, "event_types": [{"name": e} for e in events]})
         if not res.ok:

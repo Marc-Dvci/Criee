@@ -80,7 +80,7 @@ def build_mcp(core) -> MCPServer:
             "digest": digest(d.terms), "created": iso(utcnow())}))
         core.emit("draft.proposed", {"draft_id": did, "account_id": a.id, "via": "mcp", "digest": digest(d.terms)})
         return {"status": "awaiting_signature", "readback": d.readback,
-                "sign_url": f"{core.cfg.public_url}/sign/{did}", "draft_id": did}
+                "sign_url": f"{core.public_base}/sign/{did}", "draft_id": did}
 
     @server.tool(description="List the person's standing wishes with status, weekly usage and why open lots did not match.")
     def list_wishes() -> dict[str, Any]:

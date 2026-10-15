@@ -27,6 +27,19 @@ def test_criee_sale_prices_sit_between_floor_and_buyer_limit():
             assert s["unit_price_cents"] <= s["limit_cents"], s
 
 
+def test_weekly_loaf_allowance_holds_for_every_policy():
+    for seed in SEEDS:
+        res = sim.simulate(seed, ADOPTION, n_bakeries=N_BAKERIES)
+        for name, pr in res.policies.items():
+            loaves: dict[int, int] = {}
+            for s in pr.sales:
+                loaves[s["holder"]] = loaves.get(s["holder"], 0) + s["units"]
+            for j, n in loaves.items():
+                assert n <= res.world.holders[j].max_matches, (name, j, n)
+            if name == "B":
+                assert all(s["units"] == sim.B_BAG_LOAVES for s in pr.sales)
+
+
 def test_same_seed_gives_same_results():
     for seed in SEEDS:
         first = sim.run(seed, ADOPTION, n_bakeries=N_BAKERIES)

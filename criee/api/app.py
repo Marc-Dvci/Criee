@@ -5,6 +5,7 @@ import asyncio
 import hashlib
 import json
 import logging
+import os
 import secrets
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
@@ -118,7 +119,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         extra: list[asyncio.Task] = []
         if start_loops:
             await core.start()
-            if cfg.paypal_live and cfg.public_url.startswith("https://"):
+            if cfg.paypal_live and core.public_base.startswith("https://"):
                 extra.append(asyncio.create_task(register_webhook(core)))
             if cfg.paypal_live:
                 extra.append(asyncio.create_task(poll_disputes(core)))
@@ -133,7 +134,22 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
 
     app = FastAPI(title="Criée", lifespan=lifespan, docs_url="/api/docs", openapi_url="/api/openapi.json")
     app.state.core = core
-    secure = cfg.public_url.startswith("https://")
+    secure = cfg.public_url.startswith("https://") or cfg.public_url == "auto"
+
+    if cfg.public_url == "auto":
+        @app.middleware("http")
+        async def learn_base(request: Request, call_next):
+            proto = request.headers.get("x-forwarded-proto", request.url.scheme).split(",")[0].strip()
+            host = request.headers.get("x-forwarded-host") or request.headers.get("host")
+            suffix = os.environ.get("CRIEE_PUBLIC_HOST_SUFFIX", ".trycloudflare.com")
+            if host and proto == "https" and host.split(":")[0].endswith(suffix):
+                base = f"https://{host}"
+                if base != core.public_base:
+                    core.public_base = base
+                    if cfg.paypal_live:
+                        from .webhooks import register_webhook
+                        asyncio.create_task(register_webhook(core))
+            return await call_next(request)
     images = cfg.data_dir / "images"
 
     def me(request: Request, role: Optional[str] = None):
@@ -278,7 +294,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
     async def vault_start(request: Request) -> dict:
         acc = me(request)
         ref = f"{acc.id}:{secrets.token_hex(4)}"
-        res = await core.paypal.setup_token(f"{cfg.public_url}/api/vault/return", f"{cfg.public_url}/wish?vault=cancel",
+        res = await core.paypal.setup_token(f"{core.public_base}/api/vault/return", f"{core.public_base}/wish?vault=cancel",
                                             "Criée standing wishes: charged only when a match clears, within your "
                                             "signed limits", ref)
         if not res.ok:
@@ -320,7 +336,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         acc = me(request)
         token = "crt_" + secrets.token_urlsafe(24)
         core.ledger.kv_set(f"agent_token:{hashlib.sha256(token.encode()).hexdigest()}", acc.id)
-        return {"token": token, "mcp_url": f"{cfg.public_url}/mcp"}
+        return {"token": token, "mcp_url": f"{core.public_base}/mcp/"}
 
     # ------------------------------------------------------------------ seller
 

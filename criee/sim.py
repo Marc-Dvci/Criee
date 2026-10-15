@@ -65,6 +65,8 @@ B_OPEN_P = 0.25                       # per wish-holder per evening
 DEFAULT_ADOPTION = 0.03
 ADOPTION_GRID = (0.01, 0.02, 0.03, 0.05)
 SENSITIVITY_SEEDS = 10
+ATTENTION_SEEDS = 10                  # attention-parity run: seeds 0..9 at the default adoption
+ATTENTION_P = 1.0                     # A walk-by and B app-open probability in that run; C unchanged
 POLICY_NAMES = {"A": "Fixed markdown at 18:30", "B": "Surprise bag", "C": "Criee clock"}
 
 # Two-sided 95% Student-t critical values for df = 1..30 (1.96 above that).
@@ -197,7 +199,7 @@ def _sale(policy: str, day: int, bakery: int, holder: int, units: int, revenue: 
 
 # ----------------------------------------------------------------------------- policy A
 
-def _policy_a(world: World, seed: int) -> PolicyRun:
+def _policy_a(world: World, seed: int, walk_p: float = A_WALK_BY_P) -> PolicyRun:
     rng = random.Random(f"criee-sim/{seed}/{world.adoption}/A")
     bakeries, holders, dist = world.bakeries, world.holders, world.dist_m
     nb, k = len(bakeries), len(holders)
@@ -212,7 +214,7 @@ def _policy_a(world: World, seed: int) -> PolicyRun:
             if supply[b] <= 0:
                 continue
             for j in range(k):
-                if dist[j][b] <= holders[j].radius_m and rng.random() < A_WALK_BY_P:
+                if dist[j][b] <= holders[j].radius_m and rng.random() < walk_p:
                     passes.append((rng.random(), b, j))          # arrival time within 18:30-20:30
         passes.sort()
         remaining = list(supply)
@@ -236,7 +238,7 @@ def _policy_a(world: World, seed: int) -> PolicyRun:
 
 # ----------------------------------------------------------------------------- policy B
 
-def _policy_b(world: World, seed: int) -> PolicyRun:
+def _policy_b(world: World, seed: int, open_p: float = B_OPEN_P) -> PolicyRun:
     rng = random.Random(f"criee-sim/{seed}/{world.adoption}/B")
     bakeries, holders, dist = world.bakeries, world.holders, world.dist_m
     nb, k = len(bakeries), len(holders)
@@ -248,11 +250,11 @@ def _policy_b(world: World, seed: int) -> PolicyRun:
         bags = [s // B_BAG_LOAVES for s in supply]
         bags_sold = [0] * nb
         revenue = [0] * nb
-        opened = [j for j in range(k) if rng.random() < B_OPEN_P]
+        opened = [j for j in range(k) if rng.random() < open_p]
         rng.shuffle(opened)                                   # first come, first served
         for j in opened:
             h = holders[j]
-            if weekly[j] >= h.max_matches:
+            if h.max_matches - weekly[j] < B_BAG_LOAVES:   # a bag uses 3 of the weekly loaf allowance
                 continue
             options = [b for b in range(nb)
                        if dist[j][b] <= h.radius_m and bags[b] > 0
@@ -263,7 +265,7 @@ def _policy_b(world: World, seed: int) -> PolicyRun:
             bags[b] -= 1
             bags_sold[b] += 1
             revenue[b] += bakeries[b].price_cents
-            weekly[j] += 1
+            weekly[j] += B_BAG_LOAVES
             sales.append(_sale("B", d, b, j, B_BAG_LOAVES, bakeries[b].price_cents, h.limit_cents))
         for b in range(nb):
             sold_loaves = bags_sold[b] * B_BAG_LOAVES
@@ -418,9 +420,11 @@ def _policy_metrics(pr: PolicyRun, world: World) -> dict[str, Any]:
     return {k: (round(v, 6) if isinstance(v, float) else v) for k, v in out.items()}
 
 
-def simulate(seed: int, adoption: float = DEFAULT_ADOPTION, n_bakeries: int = N_BAKERIES) -> SimResult:
+def simulate(seed: int, adoption: float = DEFAULT_ADOPTION, n_bakeries: int = N_BAKERIES,
+             walk_p: float = A_WALK_BY_P, open_p: float = B_OPEN_P) -> SimResult:
     world = build_world(seed, adoption, n_bakeries)
-    policies = {"A": _policy_a(world, seed), "B": _policy_b(world, seed), "C": _policy_c(world, seed)}
+    policies = {"A": _policy_a(world, seed, walk_p), "B": _policy_b(world, seed, open_p),
+                "C": _policy_c(world, seed)}
     return SimResult(world=world, policies=policies)
 
 
@@ -435,9 +439,12 @@ def summarise(res: SimResult) -> dict[str, Any]:
     }
 
 
-def run(seed: int, adoption: float = DEFAULT_ADOPTION, n_bakeries: int = N_BAKERIES) -> dict:
+def run(seed: int, adoption: float = DEFAULT_ADOPTION, n_bakeries: int = N_BAKERIES,
+        walk_p: float = A_WALK_BY_P, open_p: float = B_OPEN_P) -> dict:
     """One seed, one adoption rate. Returns simulated metrics for policies A, B and C. Deterministic."""
-    return summarise(simulate(seed, adoption, n_bakeries))
+    out = summarise(simulate(seed, adoption, n_bakeries, walk_p, open_p))
+    out["attention"] = {"walk_by_p": walk_p, "open_p": open_p}
+    return out
 
 
 # ----------------------------------------------------------------------------- statistics over seeds
@@ -489,8 +496,7 @@ def assumptions_document() -> dict[str, Any]:
     add("list_price_eur", list(PRICE_EUR), "EUR, uniform", "brief",
         "Given in the brief. Each bakery gets one draw, so the spread across bakeries is part of the simulated variation.")
     add("unit_cost_share", COST_SHARE, "share of list price", "brief",
-        "Recorded for reference. No metric uses it: leftovers are baked whatever the policy, and "
-        "the clock floor (0.30 x list) sits below this cost.")
+        "Reported for reference only. Leftovers are sunk cost, so no decision and no metric uses it.")
     add("leftover_lambda", list(LAMBDA_RANGE), "loaves per evening, uniform lambda", "brief",
         "Leftover loaves per bakery per evening are Poisson(lambda), lambda drawn once per bakery.")
     add("residents", N_RESIDENTS, "count", "brief",
@@ -506,8 +512,9 @@ def assumptions_document() -> dict[str, Any]:
         "Limits run from about 1.58 to 4.28 EUR, the range given in the brief.")
     add("holder_radius_m", {"values": list(RADIUS_M), "weights": list(RADIUS_WEIGHTS)}, "m", "brief",
         "Half of holders accept 1.5 km, a third 2.5 km and the rest 4 km, as given in the brief.")
-    add("holder_max_matches_per_week", list(MAX_MATCHES_RANGE), "matches, uniform integer", "brief",
-        "Weekly cap per holder. Enforced in all three policies.")
+    add("holder_weekly_loaf_allowance", list(MAX_MATCHES_RANGE), "loaves per week, uniform integer", "brief",
+        "The brief's max_matches_per_week, read as a weekly loaf allowance. Enforced on the same basis in all "
+        "three policies: A and C count loaves, and B counts the 3 loaves of a bag.")
     add("holder_units", 1, "loaves per match", "brief", "One loaf per standing wish.")
     add("holder_wish_window", {"days": "all 7", "start": "17:00", "end": "21:00"}, "local time", "brief",
         "Covers the 18:30 to 20:30 pickup window in every policy.")
@@ -529,14 +536,20 @@ def assumptions_document() -> dict[str, Any]:
         "A holder who opens the app takes a bag from the nearest bakery in radius with bags left.")
     add("policy_B_order", "random, first come first served", "rule", "added",
         "Holders who open the app are served in random order.")
-    add("policy_B_loaf_per_match", "a bag is one weekly match", "rule", "added",
-        "The weekly cap counts bags, so a holder can take up to 3 x max_matches loaves in B. This favours B on units.")
+    add("policy_B_one_per_evening", "one bag per holder per evening", "rule", "added",
+        "A holder opens the app once an evening and buys at most one bag.")
+    add("policy_B_weekly_allowance", "a bag uses 3 loaves of the weekly allowance", "rule", "added",
+        "A holder with fewer than 3 loaves left in the week cannot buy a bag. A holder whose allowance is 2 "
+        "can never buy one. The same loaf cap applies to A and C.")
     add("policy_B_commission", "not modelled", "rule", "brief", "The brief leaves B's platform commission out.")
     add("policy_C_engine", "criee.engine Market + run_until, in-memory signed ledger", "rule", "brief",
-        "Policy C is the real clearing engine, not a re-implementation.")
-    add("policy_C_clock", {"start": "list price", "floor": "0.30 x list", "open": "18:30",
-                           "close": "19:10", "clock_step_s": CLOCK_STEP_S}, "EUR and time", "brief",
+        "Policy C is the real clearing engine, not a re-implementation. Its weekly match cap counts loaves, "
+        "because every match is one loaf.")
+    add("policy_C_clock", {"start": "list price", "open": "18:30", "close": "19:10",
+                           "clock_step_s": CLOCK_STEP_S}, "EUR and time", "brief",
         "Starts at list price, reaches the floor at 80 percent of the window (about 19:02), then holds it until 19:10.")
+    add("policy_C_floor", FLOOR_SHARE, "share of list price", "brief",
+        "Kept at 0.30 x list in every run. Leftovers are sunk cost, so the floor is not set from unit cost.")
     add("policy_C_pickup_window", "18:30-20:30", "time", "brief", "Pickup window of each clock lot.")
     add("policy_C_one_per_evening", "wish paused after its match, resumed next morning", "rule", "added",
         "The engine has no per-evening cap, so the sim pauses a holder's wish after a match (the engine's "
@@ -554,6 +567,13 @@ def assumptions_document() -> dict[str, Any]:
         "gets zero revenue. This is the conservative treatment the brief asks for.")
     add("policy_C_platform_fee", PLATFORM_FEE, "share of gross revenue", "brief",
         "Applied to policy C only. Policies A and B carry no fee in the model.")
+    add("attention_parity_walk_by_p", ATTENTION_P, "probability per holder per bakery in radius per evening",
+        "added", "Attention-parity run only: A's walk-by set to 1.0, so every holder in radius considers every shop every evening.")
+    add("attention_parity_open_p", ATTENTION_P, "probability per holder per evening", "added",
+        "Attention-parity run only: B's app-open set to 1.0. C is unchanged, which isolates how much of the gap comes "
+        "from standing wishes being always present versus from the clearing rule.")
+    add("attention_parity_seeds", ATTENTION_SEEDS, "seeds at the default adoption", "added",
+        "Seeds 0..9 at 3% adoption, with the same worlds as the headline run for those seeds.")
     add("seeds_headline", "0..19", "seed", "brief", "Headline run: twenty seeds at the default adoption.")
     add("seeds_sensitivity", SENSITIVITY_SEEDS, "seeds per adoption rate", "brief",
         "Sensitivity uses seeds 0..9; the 3% entry reuses the headline runs for those seeds.")
@@ -569,12 +589,12 @@ def assumptions_document() -> dict[str, Any]:
 # ----------------------------------------------------------------------------- CLI
 
 def _run_all(n_seeds: int, sens_seeds: int, log) -> dict[str, Any]:
-    cache: dict[tuple[int, float], dict] = {}
+    cache: dict[tuple, dict] = {}
 
-    def get(seed: int, adoption: float) -> dict:
-        key = (seed, round(adoption, 6))
+    def get(seed: int, adoption: float, walk_p: float = A_WALK_BY_P, open_p: float = B_OPEN_P) -> dict:
+        key = (seed, round(adoption, 6), walk_p, open_p)
         if key not in cache:
-            cache[key] = run(seed, adoption)
+            cache[key] = run(seed, adoption, walk_p=walk_p, open_p=open_p)
         return cache[key]
 
     headline_runs = []
@@ -587,14 +607,34 @@ def _run_all(n_seeds: int, sens_seeds: int, log) -> dict[str, Any]:
         by_adoption[f"{a:.2f}"] = {"adoption": a, "seeds": list(range(sens_seeds)),
                                    "n_holders": runs[0]["n_holders"], "summary": summarise_runs(runs)}
         log(f"  sensitivity adoption {a:.2f} done")
+    parity_runs = []
+    for s in range(ATTENTION_SEEDS):
+        parity_runs.append(get(s, DEFAULT_ADOPTION, ATTENTION_P, ATTENTION_P))
+        log(f"  attention-parity seed {s:2d} done")
+    same_seeds = [get(s, DEFAULT_ADOPTION) for s in range(ATTENTION_SEEDS)]
+    attention = {
+        "label": "simulated",
+        "description": ("Attention parity: A's walk-by probability and B's app-open probability are set to 1.0, "
+                        "so every wish-holder in radius considers every shop every evening. C is unchanged. "
+                        "main_run_same_seeds is the headline run over the same seeds, for comparison."),
+        "adoption": DEFAULT_ADOPTION,
+        "seeds": list(range(ATTENTION_SEEDS)),
+        "walk_by_p": ATTENTION_P,
+        "open_p": ATTENTION_P,
+        "n_holders": parity_runs[0]["n_holders"],
+        "summary": summarise_runs(parity_runs),
+        "main_run_same_seeds": summarise_runs(same_seeds),
+    }
     return {
         "label": "simulated",
         "note": "Every number in this file is simulated. Method and assumptions: docs/SIMULATION.md.",
         "week": "2026-10-19 to 2026-10-25, Europe/Paris, 7 evenings",
         "policy_names": POLICY_NAMES,
-        "headline": {"adoption": DEFAULT_ADOPTION, "seeds": list(range(n_seeds)),
-                     "runs": headline_runs, "summary": summarise_runs(headline_runs)},
+        "headline": {"adoption": DEFAULT_ADOPTION, "walk_by_p": A_WALK_BY_P, "open_p": B_OPEN_P,
+                     "seeds": list(range(n_seeds)), "runs": headline_runs,
+                     "summary": summarise_runs(headline_runs)},
         "sensitivity": by_adoption,
+        "attention_parity": attention,
     }
 
 

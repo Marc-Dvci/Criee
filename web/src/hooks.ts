@@ -52,11 +52,13 @@ export function useLive<T>(path: string | null, opts: { pollMs?: number; filter?
     if (timer.current) window.clearTimeout(timer.current)
     timer.current = window.setTimeout(load, 250)
   })
+  const live = useConnected()
+  const every = opts.pollMs ?? (live ? 0 : 4000)
   useEffect(() => {
-    if (!opts.pollMs) return
-    const id = window.setInterval(load, opts.pollMs)
+    if (!every) return
+    const id = window.setInterval(load, every)
     return () => window.clearInterval(id)
-  }, [load, opts.pollMs])
+  }, [load, every])
   return { data, error, reload: load, setData }
 }
 

@@ -21,9 +21,9 @@ HERE = GeoPoint(lat=48.58, lon=7.75)
 def test_budget_refuses_after_cutoff_and_over_caps(tmp_path):
     kv: dict = {}
     cfg = replace(make_config(tmp_path), ai_provider="gemini", gemini_api_key="k", ai_daily_cap=2,
-                  ai_per_visitor_hourly=1, ai_until=date.today() - timedelta(days=1))
+                  ai_per_visitor_hourly=1, ai_until=datetime.now(timezone.utc).date() - timedelta(days=1))
     assert Budget(cfg, kv.get, kv.__setitem__).live_allowed(None) == "after_cutoff"
-    cfg = replace(cfg, ai_until=date.today() + timedelta(days=1))
+    cfg = replace(cfg, ai_until=datetime.now(timezone.utc).date() + timedelta(days=1))
     b = Budget(cfg, kv.get, kv.__setitem__)
     assert b.live_allowed("v1") is None
     b.spend("v1")

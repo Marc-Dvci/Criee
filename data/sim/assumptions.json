@@ -1,0 +1,337 @@
+{
+  "label": "simulated",
+  "parameters": [
+    {
+      "id": "week",
+      "value": "2026-10-19 to 2026-10-25, Europe/Paris, 7 evenings",
+      "unit": "dates",
+      "origin": "added",
+      "rationale": "An ordinary week with no public holiday, so each of the seven evenings is a normal trading evening."
+    },
+    {
+      "id": "bakeries",
+      "value": 12,
+      "unit": "count",
+      "origin": "brief",
+      "rationale": "Twelve shops, one per cycle through the 11 demo neighbourhood centroids (two neighbourhoods get two)."
+    },
+    {
+      "id": "bakery_scatter_m",
+      "value": 600.0,
+      "unit": "m",
+      "origin": "brief",
+      "rationale": "Each shop is placed uniformly over a disc of this radius around its neighbourhood centroid."
+    },
+    {
+      "id": "list_price_eur",
+      "value": [
+        3.5,
+        5.5
+      ],
+      "unit": "EUR, uniform",
+      "origin": "brief",
+      "rationale": "Given in the brief. Each bakery gets one draw, so the spread across bakeries is part of the simulated variation."
+    },
+    {
+      "id": "unit_cost_share",
+      "value": 0.35,
+      "unit": "share of list price",
+      "origin": "brief",
+      "rationale": "Recorded for reference. No metric uses it: leftovers are baked whatever the policy, and the clock floor (0.30 x list) sits below this cost."
+    },
+    {
+      "id": "leftover_lambda",
+      "value": [
+        8.0,
+        20.0
+      ],
+      "unit": "loaves per evening, uniform lambda",
+      "origin": "brief",
+      "rationale": "Leftover loaves per bakery per evening are Poisson(lambda), lambda drawn once per bakery."
+    },
+    {
+      "id": "residents",
+      "value": 10000,
+      "unit": "count",
+      "origin": "brief",
+      "rationale": "Placed by neighbourhood weight from demo.NEIGHBOURHOODS, with the brief's position jitter."
+    },
+    {
+      "id": "resident_jitter_deg",
+      "value": {
+        "lat": 0.004,
+        "lon": 0.006
+      },
+      "unit": "degrees, uniform +/-",
+      "origin": "brief",
+      "rationale": "Keeps residents from sitting exactly on a centroid."
+    },
+    {
+      "id": "adoption_default",
+      "value": 0.03,
+      "unit": "share of residents",
+      "origin": "brief",
+      "rationale": "Share of residents holding a standing bread wish in the headline run."
+    },
+    {
+      "id": "adoption_grid",
+      "value": [
+        0.01,
+        0.02,
+        0.03,
+        0.05
+      ],
+      "unit": "share of residents",
+      "origin": "brief",
+      "rationale": "Sensitivity grid. Adopter sets are nested: each rate includes every holder of the lower rates."
+    },
+    {
+      "id": "holder_limit_eur",
+      "value": {
+        "share_range": [
+          0.35,
+          0.95
+        ],
+        "reference_eur": 4.5,
+        "rounding": "cents"
+      },
+      "unit": "EUR, uniform",
+      "origin": "brief",
+      "rationale": "Limits run from about 1.58 to 4.28 EUR, the range given in the brief."
+    },
+    {
+      "id": "holder_radius_m",
+      "value": {
+        "values": [
+          1500,
+          2500,
+          4000
+        ],
+        "weights": [
+          0.5,
+          0.35,
+          0.15
+        ]
+      },
+      "unit": "m",
+      "origin": "brief",
+      "rationale": "Half of holders accept 1.5 km, a third 2.5 km and the rest 4 km, as given in the brief."
+    },
+    {
+      "id": "holder_max_matches_per_week",
+      "value": [
+        2,
+        4
+      ],
+      "unit": "matches, uniform integer",
+      "origin": "brief",
+      "rationale": "Weekly cap per holder. Enforced in all three policies."
+    },
+    {
+      "id": "holder_units",
+      "value": 1,
+      "unit": "loaves per match",
+      "origin": "brief",
+      "rationale": "One loaf per standing wish."
+    },
+    {
+      "id": "holder_wish_window",
+      "value": {
+        "days": "all 7",
+        "start": "17:00",
+        "end": "21:00"
+      },
+      "unit": "local time",
+      "origin": "brief",
+      "rationale": "Covers the 18:30 to 20:30 pickup window in every policy."
+    },
+    {
+      "id": "holder_budget_per_week_cents",
+      "value": "limit x max_matches",
+      "unit": "cents",
+      "origin": "added",
+      "rationale": "Set so the weekly budget can never bind before the match cap does (every price is at most the limit)."
+    },
+    {
+      "id": "policy_A_price_share",
+      "value": 0.5,
+      "unit": "share of list price",
+      "origin": "brief",
+      "rationale": "Fixed markdown from 18:30, the same for every loaf of the bakery that evening."
+    },
+    {
+      "id": "policy_A_walk_by_p",
+      "value": 0.1,
+      "unit": "probability per holder per bakery in radius per evening",
+      "origin": "brief",
+      "rationale": "Stands in for passers-by who would buy. Same demand pool as the other policies."
+    },
+    {
+      "id": "policy_A_arrival",
+      "value": "uniform over 18:30-20:30",
+      "unit": "time",
+      "origin": "added",
+      "rationale": "Passers arrive in a random order within the pickup window; earlier arrivals take loaves first."
+    },
+    {
+      "id": "policy_A_one_per_evening",
+      "value": true,
+      "unit": "flag",
+      "origin": "brief",
+      "rationale": "A holder buys at most one loaf per evening."
+    },
+    {
+      "id": "policy_B_bag_loaves",
+      "value": 3,
+      "unit": "loaves per bag",
+      "origin": "brief",
+      "rationale": "Bags of three loaves."
+    },
+    {
+      "id": "policy_B_bag_price",
+      "value": "list price",
+      "unit": "EUR per bag",
+      "origin": "brief",
+      "rationale": "One third of the three-loaf value, which is the list price per bag."
+    },
+    {
+      "id": "policy_B_open_p",
+      "value": 0.25,
+      "unit": "probability per holder per evening",
+      "origin": "brief",
+      "rationale": "Each holder opens the bag app on a given evening with this probability."
+    },
+    {
+      "id": "policy_B_choice",
+      "value": "nearest eligible bakery",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "A holder who opens the app takes a bag from the nearest bakery in radius with bags left."
+    },
+    {
+      "id": "policy_B_order",
+      "value": "random, first come first served",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "Holders who open the app are served in random order."
+    },
+    {
+      "id": "policy_B_loaf_per_match",
+      "value": "a bag is one weekly match",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "The weekly cap counts bags, so a holder can take up to 3 x max_matches loaves in B. This favours B on units."
+    },
+    {
+      "id": "policy_B_commission",
+      "value": "not modelled",
+      "unit": "rule",
+      "origin": "brief",
+      "rationale": "The brief leaves B's platform commission out."
+    },
+    {
+      "id": "policy_C_engine",
+      "value": "criee.engine Market + run_until, in-memory signed ledger",
+      "unit": "rule",
+      "origin": "brief",
+      "rationale": "Policy C is the real clearing engine, not a re-implementation."
+    },
+    {
+      "id": "policy_C_clock",
+      "value": {
+        "start": "list price",
+        "floor": "0.30 x list",
+        "open": "18:30",
+        "close": "19:10",
+        "clock_step_s": 60
+      },
+      "unit": "EUR and time",
+      "origin": "brief",
+      "rationale": "Starts at list price, reaches the floor at 80 percent of the window (about 19:02), then holds it until 19:10."
+    },
+    {
+      "id": "policy_C_pickup_window",
+      "value": "18:30-20:30",
+      "unit": "time",
+      "origin": "brief",
+      "rationale": "Pickup window of each clock lot."
+    },
+    {
+      "id": "policy_C_one_per_evening",
+      "value": "wish paused after its match, resumed next morning",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "The engine has no per-evening cap, so the sim pauses a holder's wish after a match (the engine's own pause state) so the holder cannot buy from a second bakery that evening. Holders at their weekly cap stay paused for the rest of the week."
+    },
+    {
+      "id": "policy_C_listing_order",
+      "value": "random each evening",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "The engine breaks same-minute ties by listing order, so the order is shuffled each evening."
+    },
+    {
+      "id": "policy_C_sold_out_close",
+      "value": "a lot closes the moment it sells out",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "The engine would keep emitting empty ticks until 19:10. No fill can happen after sell-out, so allocations are unchanged; checked against the unshortened run on four seed and adoption pairs."
+    },
+    {
+      "id": "policy_C_noshow_rate",
+      "value": 0.08,
+      "unit": "share of matches",
+      "origin": "brief",
+      "rationale": "A match is a no-show when a hash of the seed and match id falls in the lowest 8 percent, so each seed has a fixed set of no-shows."
+    },
+    {
+      "id": "policy_C_noshow_treatment",
+      "value": "captured then fully refunded at match time",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "A no-show's unit never returns to the clock, its buyer's weekly match still counts, and the seller gets zero revenue. This is the conservative treatment the brief asks for."
+    },
+    {
+      "id": "policy_C_platform_fee",
+      "value": 0.04,
+      "unit": "share of gross revenue",
+      "origin": "brief",
+      "rationale": "Applied to policy C only. Policies A and B carry no fee in the model."
+    },
+    {
+      "id": "seeds_headline",
+      "value": "0..19",
+      "unit": "seed",
+      "origin": "brief",
+      "rationale": "Headline run: twenty seeds at the default adoption."
+    },
+    {
+      "id": "seeds_sensitivity",
+      "value": 10,
+      "unit": "seeds per adoption rate",
+      "origin": "brief",
+      "rationale": "Sensitivity uses seeds 0..9; the 3% entry reuses the headline runs for those seeds."
+    },
+    {
+      "id": "ci_method",
+      "value": "Student-t 95% interval of the mean across seeds",
+      "unit": "statistic",
+      "origin": "added",
+      "rationale": "Used for the figure whiskers and the shaded band. The sd is the sample sd (n-1)."
+    },
+    {
+      "id": "drop_one_seed",
+      "value": "min and max of the mean with one seed left out",
+      "unit": "statistic",
+      "origin": "brief",
+      "rationale": "Shows how much one seed can move the mean."
+    },
+    {
+      "id": "rng",
+      "value": "random.Random seeded from a string, per seed and per policy",
+      "unit": "rule",
+      "origin": "added",
+      "rationale": "Each policy has its own stream, so changing one policy cannot shift another."
+    }
+  ]
+}

@@ -40,6 +40,7 @@ class SettlementWorker:
         core = self.core
         acts = [a for a in settlement_actions(core.market, utcnow()) if (a.kind, a.match_id) not in core.inflight]
         payouts = self.payout_groups()
+        await self.answer_disputes()
         if not acts and not payouts:
             await self.poll_payouts()
             return 0
@@ -155,6 +156,30 @@ class SettlementWorker:
                                               "reason": reason[:120], "seller_id": core.market.lots[m.fill.lot_id].seller_id,
                                               "full": s.refunded_cents + cents >= s.captured_cents})
         return res
+
+    async def answer_disputes(self) -> None:
+        """Criée is the merchant of record: it answers each dispute with the evidence pack from the ledger."""
+        from ..api.disputes import send_evidence_pack
+        core = self.core
+        for d in list(core.book.disputes.values()):
+            key = ("evidence", d.dispute_id)
+            if d.evidence_sent or not d.match_id or d.status == "RESOLVED" or key in core.inflight:
+                continue
+            tries = int(core.ledger.kv_get(f"evidence_tries:{d.dispute_id}") or 0)
+            last = float(core.ledger.kv_get(f"evidence_last:{d.dispute_id}") or 0)
+            if tries >= 6 or (tries and time.time() - last < 300 * tries):
+                continue
+            core.inflight.add(key)
+            try:
+                res = await send_evidence_pack(core, d.dispute_id)
+                if not res.get("ok"):
+                    core.ledger.kv_set(f"evidence_tries:{d.dispute_id}", str(tries + 1))
+                    core.ledger.kv_set(f"evidence_last:{d.dispute_id}", str(time.time()))
+                    log.warning("evidence for %s refused: %s", d.dispute_id, res)
+            except Exception:
+                log.exception("evidence for %s failed", d.dispute_id)
+            finally:
+                core.inflight.discard(key)
 
     # ------------------------------------------------------------------ payouts
 

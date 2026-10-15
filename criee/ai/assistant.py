@@ -134,6 +134,18 @@ def run_criee_tool(core, acc, name: str, args: dict) -> dict:
     return {"error": f"unknown tool {name}"}
 
 
+def _lift_images(out: Any, found: list[str]) -> Any:
+    """Move base64 images out of a tool result so they reach the screen, not the model."""
+    if isinstance(out, str) and len(out) > 800 and re.fullmatch(r"[A-Za-z0-9+/=\s]+", out[:2000]):
+        found.append(re.sub(r"\s", "", out))
+        return "[image shown to the seller]"
+    if isinstance(out, dict):
+        return {k: _lift_images(v, found) for k, v in out.items()}
+    if isinstance(out, list):
+        return [_lift_images(v, found) for v in out]
+    return out
+
+
 async def _run_tool(core, acc, api, name: str, args: dict) -> dict:
     if name in TOOLKIT_ALLOWED and api is not None:
         if name == "list_disputes":
@@ -185,6 +197,7 @@ async def run_assistant(core, acc, messages: list[dict], visitor: Optional[str] 
                 for m in texts]
     used: list[dict] = []
     pending = None
+    images: list[str] = []
     if core.ai is None:
         return _fallback(core, acc, texts[-1]["text"])
     try:
@@ -194,11 +207,11 @@ async def run_assistant(core, acc, messages: list[dict], visitor: Optional[str] 
             calls = [p["functionCall"] for p in parts if "functionCall" in p]
             if not calls:
                 reply = " ".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
-                return {"reply": reply or "Done.", "tools": used, "pending": pending}
+                return {"reply": reply or "Done.", "tools": used, "pending": pending, "images": images[:2]}
             contents.append({"role": "model", "parts": parts})
             responses = []
             for c in calls:
-                out = await _run_tool(core, acc, api, c["name"], c.get("args") or {})
+                out = _lift_images(await _run_tool(core, acc, api, c["name"], c.get("args") or {}), images)
                 used.append({"name": c["name"], "via": out.get("via", "criee"), "ok": "error" not in out})
                 if "pending_action" in out:
                     pending = out["pending_action"]

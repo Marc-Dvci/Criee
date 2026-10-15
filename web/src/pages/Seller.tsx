@@ -327,7 +327,7 @@ function DemandTab() {
   )
 }
 
-type Msg = { role: 'user' | 'model'; text: string; tools?: { name: string; via: string; ok?: boolean }[]; pending?: any }
+type Msg = { role: 'user' | 'model'; text: string; tools?: { name: string; via: string; ok?: boolean }[]; pending?: any; images?: string[] }
 
 function AssistantTab() {
   const [msgs, setMsgs] = useState<Msg[]>([])
@@ -341,7 +341,7 @@ function AssistantTab() {
     setMsgs(next); setText(''); setBusy(true)
     try {
       const r = await api.post<any>('/api/assistant', { messages: next.map(({ role, text }) => ({ role, text })) })
-      setMsgs([...next, { role: 'model', text: r.reply, tools: r.tools, pending: r.pending }])
+      setMsgs([...next, { role: 'model', text: r.reply, tools: r.tools, pending: r.pending, images: r.images }])
     } catch (e: any) { toast(e.message, true) }
     setBusy(false)
   }
@@ -366,6 +366,7 @@ function AssistantTab() {
           <div key={i} className={`bubble ${m.role === 'user' ? 'me' : 'bot'}`}>
             {m.text}
             {m.tools && m.tools.length > 0 && <div className="toolchips">{m.tools.map((t, k) => <span key={k} className={`chip ${t.via === 'paypal_agent_toolkit' ? 'info' : ''}`}>{t.via === 'paypal_agent_toolkit' ? 'PayPal Agent Toolkit' : 'Criée'} · {t.name}</span>)}</div>}
+            {m.images?.map((src, k) => <img key={k} src={`data:image/png;base64,${src}`} alt="PayPal invoice QR code" style={{ display: 'block', width: 180, marginTop: 8, borderRadius: 8, background: '#fff', padding: 6 }} />)}
             {m.pending && <div className="row" style={{ marginTop: 8 }}><button className="btn signal small" onClick={() => confirm(m.pending, i)}>Confirm: {m.pending.summary}</button></div>}
           </div>
         ))}

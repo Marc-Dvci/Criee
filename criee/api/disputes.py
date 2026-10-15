@@ -63,11 +63,19 @@ def build_pack(core: Core, match_id: str, dispute_id: str, reason: str) -> Evide
         public_key_pem=core.ledger.signer.public_pem(), crop_images=tuple(crops))
 
 
+def combined_entry(entries: list[dict]) -> list[dict]:
+    """PayPal wants an item id per entry when several are sent; one entry carries everything."""
+    first = dict(entries[0])
+    notes = " ".join(e.get("notes", "") for e in entries if e.get("notes"))
+    first["notes"] = notes if len(notes) <= 2000 else notes[:1997] + "..."
+    return [first]
+
+
 async def send_evidence_pack(core: Core, dispute_id: str) -> dict:
     d = core.book.disputes[dispute_id]
     pack = build_pack(core, d.match_id, dispute_id, d.reason)
     pdf = build_evidence_pdf(pack)
-    entries = evidence_entries(pack)
+    entries = combined_entry(evidence_entries(pack))
     res = await core.paypal.provide_evidence(dispute_id, entries, [(f"criee-evidence-{d.match_id}.pdf", pdf)])
     if not res.ok and hasattr(core.paypal, "sandbox_require_evidence"):
         await core.paypal.sandbox_require_evidence(dispute_id)

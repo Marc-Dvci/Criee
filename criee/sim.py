@@ -288,11 +288,14 @@ def _policy_c(world: World, seed: int) -> PolicyRun:
         def append(evs: list) -> list:
             stored = ledger.append_many(evs)
             follow: list[tuple[str, dict[str, Any], datetime]] = []
+            sold_now: dict[str, tuple[int, datetime]] = {}
             for ev in stored:
                 if ev.type != "match.made":
                     continue
-                mid = ev.body["fill"]["match_id"]
-                wid = ev.body["fill"]["wish_id"]
+                fill = ev.body["fill"]
+                mid, wid, lid = fill["match_id"], fill["wish_id"], fill["lot_id"]
+                units_so_far = sold_now.get(lid, (0, ev.at))[0]
+                sold_now[lid] = (units_so_far + fill["units"], ev.at)
                 # The buyer's hold is captured at match time, so the engine never schedules its own
                 # no-show return and never resells a unit during the clock.
                 follow.append(("settlement.captured", {"match_id": mid}, ev.at))
@@ -300,6 +303,12 @@ def _policy_c(world: World, seed: int) -> PolicyRun:
                     follow.append(("settlement.refunded", {"match_id": mid, "full": True}, ev.at))
                 # One loaf per resident per evening: the wish is paused until the next morning.
                 follow.append(("wish.paused", {"wish_id": wid}, ev.at))
+            for lid, (units, at) in sold_now.items():
+                # Sold out: no tick after this can fill anything, so the sim closes the lot now
+                # instead of letting the engine emit empty ticks until 19:10. Allocations are unchanged.
+                if market.lots[lid].remaining - units <= 0:
+                    follow.append(("lot.closed", {"lot_id": lid, "reason": "sold_out",
+                                                  "seed": market.seed(lid), "unsold": 0}, at))
             return stored + (ledger.append_many(follow) if follow else [])
 
         for j, h in enumerate(holders):
@@ -317,9 +326,13 @@ def _policy_c(world: World, seed: int) -> PolicyRun:
         lot_meta: dict[str, tuple[int, int, int]] = {}      # lot_id -> (day, bakery, floor_cents)
         for d in range(N_DAYS):
             day0 = datetime(WEEK_MONDAY[0], WEEK_MONDAY[1], WEEK_MONDAY[2] + d, 0, 0, tzinfo=TZ)
+            # Resume yesterday's pauses. A holder at the weekly cap stays paused: every match counts
+            # toward the cap for the rest of the week, so the engine would refuse them anyway.
             paused = [wid for wid, w in market.wishes.items() if w.status == "paused"]
             for wid in paused:
-                emit("wish.resumed", {"wish_id": wid}, day0)
+                j = int(wid.split("_")[1])
+                if len(market.by_wish.get(wid, [])) < holders[j].max_matches:
+                    emit("wish.resumed", {"wish_id": wid}, day0)
             opens = datetime(WEEK_MONDAY[0], WEEK_MONDAY[1], WEEK_MONDAY[2] + d, 18, 30, tzinfo=TZ)
             closes = opens + timedelta(minutes=CLOCK_MINUTES)
             order = [b for b in range(nb) if world.supply[d][b] > 0]
@@ -468,13 +481,13 @@ def assumptions_document() -> dict[str, Any]:
         p.append({"id": id_, "value": value, "unit": unit, "origin": origin, "rationale": rationale})
 
     add("week", "2026-10-19 to 2026-10-25, Europe/Paris, 7 evenings", "dates", "added",
-        "One ordinary week with no public holiday; the weekday pattern is the only thing that varies by day.")
+        "An ordinary week with no public holiday, so each of the seven evenings is a normal trading evening.")
     add("bakeries", N_BAKERIES, "count", "brief",
         "Twelve shops, one per cycle through the 11 demo neighbourhood centroids (two neighbourhoods get two).")
     add("bakery_scatter_m", BAKERY_SCATTER_M, "m", "brief",
         "Each shop is placed uniformly over a disc of this radius around its neighbourhood centroid.")
     add("list_price_eur", list(PRICE_EUR), "EUR, uniform", "brief",
-        "Spread of loaf prices seen across Strasbourg bakeries; each bakery gets one draw.")
+        "Given in the brief. Each bakery gets one draw, so the spread across bakeries is part of the simulated variation.")
     add("unit_cost_share", COST_SHARE, "share of list price", "brief",
         "Recorded for reference. No metric uses it: leftovers are baked whatever the policy, and "
         "the clock floor (0.30 x list) sits below this cost.")
@@ -490,9 +503,9 @@ def assumptions_document() -> dict[str, Any]:
         "Sensitivity grid. Adopter sets are nested: each rate includes every holder of the lower rates.")
     add("holder_limit_eur", {"share_range": list(LIMIT_SHARE_RANGE), "reference_eur": LIMIT_REF_EUR,
                              "rounding": "cents"}, "EUR, uniform", "brief",
-        "A holder's bread limit is U(0.35, 0.95) x 4.50 EUR, the range a standing bread wish sees.")
+        "Limits run from about 1.58 to 4.28 EUR, the range given in the brief.")
     add("holder_radius_m", {"values": list(RADIUS_M), "weights": list(RADIUS_WEIGHTS)}, "m", "brief",
-        "Most wishes cover a few neighbourhoods; a minority reach across the city.")
+        "Half of holders accept 1.5 km, a third 2.5 km and the rest 4 km, as given in the brief.")
     add("holder_max_matches_per_week", list(MAX_MATCHES_RANGE), "matches, uniform integer", "brief",
         "Weekly cap per holder. Enforced in all three policies.")
     add("holder_units", 1, "loaves per match", "brief", "One loaf per standing wish.")
@@ -523,15 +536,19 @@ def assumptions_document() -> dict[str, Any]:
         "Policy C is the real clearing engine, not a re-implementation.")
     add("policy_C_clock", {"start": "list price", "floor": "0.30 x list", "open": "18:30",
                            "close": "19:10", "clock_step_s": CLOCK_STEP_S}, "EUR and time", "brief",
-        "The clock descends from list price to 0.30 x list over 40 minutes.")
+        "Starts at list price, reaches the floor at 80 percent of the window (about 19:02), then holds it until 19:10.")
     add("policy_C_pickup_window", "18:30-20:30", "time", "brief", "Pickup window of each clock lot.")
     add("policy_C_one_per_evening", "wish paused after its match, resumed next morning", "rule", "added",
         "The engine has no per-evening cap, so the sim pauses a holder's wish after a match (the engine's "
-        "own pause state) so the holder cannot buy from a second bakery that evening.")
+        "own pause state) so the holder cannot buy from a second bakery that evening. Holders at their weekly cap "
+        "stay paused for the rest of the week.")
     add("policy_C_listing_order", "random each evening", "rule", "added",
         "The engine breaks same-minute ties by listing order, so the order is shuffled each evening.")
+    add("policy_C_sold_out_close", "a lot closes the moment it sells out", "rule", "added",
+        "The engine would keep emitting empty ticks until 19:10. No fill can happen after sell-out, so "
+        "allocations are unchanged; checked against the unshortened run on four seed and adoption pairs.")
     add("policy_C_noshow_rate", NOSHOW_RATE, "share of matches", "brief",
-        "Chosen by hash of the match id, so the same matches are no-shows for each seed.")
+        "A match is a no-show when a hash of the seed and match id falls in the lowest 8 percent, so each seed has a fixed set of no-shows.")
     add("policy_C_noshow_treatment", "captured then fully refunded at match time", "rule", "added",
         "A no-show's unit never returns to the clock, its buyer's weekly match still counts, and the seller "
         "gets zero revenue. This is the conservative treatment the brief asks for.")

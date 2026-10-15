@@ -228,8 +228,8 @@ textarea.input { resize: vertical; min-height: 92px; line-height: 1.45; }
 .phone { max-width: 520px; margin: 0 auto; }
 .big-price { font-size: 46px; }
 .crops { display: flex; gap: 8px; flex-wrap: wrap; }
-.crop { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; font-size: 11.5px; color: var(--muted); max-width: 140px; }
-.crop img { height: 58px; border-radius: 7px; border: 1px solid var(--line-strong); object-fit: cover; max-width: 140px; }
+.crop { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; font-size: 11.5px; color: var(--muted); max-width: 200px; }
+.crop img { height: 58px; width: auto; max-width: 200px; border-radius: 7px; border: 1px solid var(--line-strong); object-fit: contain; background: #fff; }
 .shelf-img { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; }
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .keypad button { padding: 16px 0; font-size: 22px; font-family: var(--mono); border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); cursor: pointer; }

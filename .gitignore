@@ -8,3 +8,5 @@ web/dist/
 .pytest_cache/
 .hypothesis/
 var/
+bundle.tar*
+deploy/.criee.env

@@ -1,7 +1,6 @@
 .venv
 var
 web/node_modules
-web/dist
 .env
 **/__pycache__
 .pytest_cache

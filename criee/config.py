@@ -42,6 +42,9 @@ class Config:
     session_secret: str
     rp_id: Optional[str]
     clock_scale: float
+    ai_daily_usd: float = 1.0
+    ai_usd_in_per_m: float = 0.75
+    ai_usd_out_per_m: float = 3.75
 
     @property
     def paypal_live(self) -> bool:
@@ -82,4 +85,7 @@ def load(env_file: Optional[Path] = None) -> Config:
         session_secret=secret_file.read_text().strip(),
         rp_id=e("CRIEE_RP_ID") or None,
         clock_scale=float(e("CRIEE_CLOCK_SCALE", "1")),
+        ai_daily_usd=float(e("CRIEE_AI_DAILY_USD", "1.0")),
+        ai_usd_in_per_m=float(e("CRIEE_AI_USD_IN_PER_M", "0.75")),
+        ai_usd_out_per_m=float(e("CRIEE_AI_USD_OUT_PER_M", "3.75")),
     )

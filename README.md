@@ -116,7 +116,7 @@ Every mutating call carries a `PayPal-Request-Id` derived from the match it sett
 | Seller assistant (`ai/assistant.py`) | Gemini function calling over the Agent Toolkit tools and Criée's seller-scoped tools, with thought signatures echoed back | Refunds are prepared by the assistant and executed only when the seller taps Confirm. Invoice QR codes go to the screen, never back to the model |
 | Agents (`mcp_server.py`) | Any MCP client: `create_wish`, `list_wishes`, `pause_wish`, `resume_wish`, `revoke_wish`, `list_matches`, `market_now` | `create_wish` returns a signing link. An agent can never sign a wish |
 
-Model access is server-side only. Live calls stop after a configured date, past a daily cap and past a per-visitor hourly allowance. The demo inputs are recorded in `data/ai_recordings`, and every component has a deterministic fallback. The whole product therefore runs with no key at all.
+Model access is server-side only. Live calls stop after a configured date, past a daily call cap, past a daily dollar budget and past a per-visitor hourly allowance. Each call reserves the most it could cost before it is sent and settles to its billed tokens after, so the dollar budget holds even under concurrent calls. The demo inputs are recorded in `data/ai_recordings`, and every component has a deterministic fallback. The whole product therefore runs with no key at all.
 
 ### The engine and its invariants
 
@@ -132,7 +132,7 @@ Model access is server-side only. Live calls stop after a configured date, past 
 
 The ledger (`criee/ledger.py`) is append-only SQLite with triggers that refuse updates and deletes. Each event commits to the previous event's hash and carries an Ed25519 signature, and `/api/ledger/verify` re-checks the whole chain.
 
-`pytest` runs 57 tests: engine rules, invariants, settlement against an in-memory PayPal double, the HTTP API including MCP and signatures, the evidence PDF, the AI guardrails and the simulation.
+`pytest` runs 58 tests: engine rules, invariants, settlement against an in-memory PayPal double, the HTTP API including MCP and signatures, the evidence PDF, the AI guardrails and the simulation.
 
 ## Design
 
@@ -197,7 +197,7 @@ For development:
 uv venv --python 3.12 && uv pip install -e ".[dev]"
 uvicorn criee.api.app:create_app --factory --reload      # API on :8000
 cd web && npm ci && npm run dev                             # UI on :5173, proxied to the API
-pytest                                                      # 57 tests
+pytest                                                      # 58 tests
 python -m criee.sim --seeds 20 --out data/sim/results.json  # simulation
 ```
 

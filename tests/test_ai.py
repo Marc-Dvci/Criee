@@ -33,6 +33,25 @@ def test_budget_refuses_after_cutoff_and_over_caps(tmp_path):
     assert Budget(replace(cfg, ai_provider="recorded"), kv.get, kv.__setitem__).live_allowed(None) == "no_live_model"
 
 
+def test_dollar_budget_reserves_then_settles_to_billed_tokens(tmp_path):
+    kv: dict = {}
+    cfg = replace(make_config(tmp_path), ai_provider="gemini", gemini_api_key="k", ai_daily_cap=10_000,
+                  ai_per_visitor_hourly=10_000, ai_daily_usd=1.0)
+    b = Budget(cfg, kv.get, kv.__setitem__)
+    # a wish read as billed on the sandbox run: 1,229 in, 152 out, 232 thinking
+    usage = {"promptTokenCount": 1229, "candidatesTokenCount": 152, "thoughtsTokenCount": 232}
+    assert abs(b.cost_usd(usage) - (1229 * 0.75 + 384 * 3.75) / 1e6) < 1e-9
+    b.spend(None)
+    assert abs(b.usd_today() - b.reserve_usd()) < 1e-6
+    b.settle(usage)
+    assert abs(b.usd_today() - b.cost_usd(usage)) < 1e-6
+    # calls in flight hold their reservation, so the day stops before the next one could overrun
+    while b.live_allowed(None) is None:
+        b.spend(None)
+    assert b.live_allowed(None) == "daily_usd"
+    assert b.usd_today() <= 1.0
+
+
 def test_without_a_model_the_wish_compiler_uses_rules(tmp_path):
     ai = AI(make_config(tmp_path), {}.get, {}.__setitem__)
     d = asyncio.run(compile_wish(ai, "Une baguette bio, 1,30 € max, en semaine après 18h", HERE, "Krutenau", NOW))

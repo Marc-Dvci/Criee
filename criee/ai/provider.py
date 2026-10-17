@@ -2,7 +2,9 @@
 
 Order of resolution for a request: a committed recording (the demo inputs), the runtime cache,
 then a live call when the budget allows it. A live call is refused after `CRIEE_AI_UNTIL`, past
-the daily cap, or past a visitor's hourly allowance; callers then use their deterministic path.
+the daily call cap, past the daily dollar budget, or past a visitor's hourly allowance; callers then
+use their deterministic path. Each live call reserves the most one call can cost before it is sent,
+and settles to its billed tokens after, so concurrent calls cannot overrun the dollar budget.
 The API key stays on the server: no route returns it and the browser never calls the model.
 """
 from __future__ import annotations
@@ -24,6 +26,9 @@ from ..config import ROOT, Config
 log = logging.getLogger("criee.ai")
 
 RECORDINGS = ROOT / "data" / "ai_recordings"
+MAX_OUTPUT_TOKENS = 8192
+# the most one call can cost: four photos and a voice note in, MAX_OUTPUT_TOKENS out
+RESERVE_IN_TOKENS = 12_000
 
 
 class AIUnavailable(RuntimeError):
@@ -76,6 +81,8 @@ class Budget:
             return "after_cutoff"
         if int(self.kv_get(f"ai_calls:{today.isoformat()}") or 0) >= cfg.ai_daily_cap:
             return "daily_cap"
+        if self.usd_today() + self.reserve_usd() > cfg.ai_daily_usd:
+            return "daily_usd"
         if visitor:
             now = time.time()
             hits = [t for t in self._visitors.get(visitor, []) if now - t < 3600]
@@ -87,8 +94,30 @@ class Budget:
     def spend(self, visitor: Optional[str]) -> None:
         today = datetime.now(timezone.utc).date().isoformat()
         self.kv_set(f"ai_calls:{today}", str(int(self.kv_get(f"ai_calls:{today}") or 0) + 1))
+        self._add_usd(self.reserve_usd())
         if visitor:
             self._visitors.setdefault(visitor, []).append(time.time())
+
+    def settle(self, usage: Optional[dict]) -> float:
+        """Replace a call's reservation with what its tokens cost. Thinking tokens bill as output."""
+        cost = self.cost_usd(usage) if usage else self.reserve_usd()
+        self._add_usd(cost - self.reserve_usd())
+        return cost
+
+    def cost_usd(self, usage: dict) -> float:
+        out = int(usage.get("candidatesTokenCount") or 0) + int(usage.get("thoughtsTokenCount") or 0)
+        return (int(usage.get("promptTokenCount") or 0) * self.cfg.ai_usd_in_per_m
+                + out * self.cfg.ai_usd_out_per_m) / 1e6
+
+    def reserve_usd(self) -> float:
+        return self.cost_usd({"promptTokenCount": RESERVE_IN_TOKENS, "candidatesTokenCount": MAX_OUTPUT_TOKENS})
+
+    def usd_today(self) -> float:
+        return int(self.kv_get(f"ai_usd_micro:{datetime.now(timezone.utc).date().isoformat()}") or 0) / 1e6
+
+    def _add_usd(self, usd: float) -> None:
+        k = f"ai_usd_micro:{datetime.now(timezone.utc).date().isoformat()}"
+        self.kv_set(k, str(int(self.kv_get(k) or 0) + round(usd * 1e6)))
 
     def calls_today(self) -> int:
         return int(self.kv_get(f"ai_calls:{datetime.now(timezone.utc).date().isoformat()}") or 0)
@@ -152,10 +181,11 @@ class AI:
                 "contents": [{"role": "user", "parts": _parts_json(parts)}],
                 "generationConfig": {"responseMimeType": "application/json", "responseSchema": schema,
                                      "temperature": 0.2, "thinkingConfig": {"thinkingLevel": thinking},
-                                     "mediaResolution": "MEDIA_RESOLUTION_MEDIUM"}}
+                                     "mediaResolution": "MEDIA_RESOLUTION_MEDIUM", "maxOutputTokens": MAX_OUTPUT_TOKENS}}
         t0 = time.perf_counter()
         res = await self._generate(body)
         ms = round((time.perf_counter() - t0) * 1000)
+        self.budget.settle(res.get("usageMetadata"))
         try:
             text = "".join(p.get("text", "") for p in res["candidates"][0]["content"]["parts"] if not p.get("thought"))
             out = json.loads(text)
@@ -181,8 +211,10 @@ class AI:
         self.budget.spend(visitor)
         body = {"systemInstruction": {"parts": [{"text": system}]}, "contents": contents,
                 "tools": [{"functionDeclarations": tools}],
-                "generationConfig": {"temperature": 0.1, "thinkingConfig": {"thinkingLevel": "LOW"}}}
+                "generationConfig": {"temperature": 0.1, "thinkingConfig": {"thinkingLevel": "LOW"},
+                                     "maxOutputTokens": MAX_OUTPUT_TOKENS}}
         res = await self._generate(body)
+        self.budget.settle(res.get("usageMetadata"))
         try:
             content = res["candidates"][0]["content"]
         except (KeyError, IndexError):

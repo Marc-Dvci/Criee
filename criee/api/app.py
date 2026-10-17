@@ -162,7 +162,8 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         return {"paypal": "sandbox" if cfg.paypal_live else "offline double", "currency": cfg.currency,
                 "ai": {"provider": cfg.ai_provider, "model": cfg.gemini_model,
                        "live_until": cfg.ai_until.isoformat() if cfg.ai_until else None,
-                       "calls_today": core.ai.budget.calls_today() if core.ai else 0, "daily_cap": cfg.ai_daily_cap},
+                       "calls_today": core.ai.budget.calls_today() if core.ai else 0, "daily_cap": cfg.ai_daily_cap,
+                       "usd_today": round(core.ai.budget.usd_today(), 4) if core.ai else 0, "daily_usd": cfg.ai_daily_usd},
                 "ledger": {"events": core.ledger.head[0], "head": core.ledger.head[1]},
                 "fee_bps": cfg.fee_bps}
 

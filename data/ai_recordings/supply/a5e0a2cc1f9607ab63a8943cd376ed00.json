@@ -1,16 +1,16 @@
 {
  "task": "supply",
  "model": "gemini-3.7-flash",
- "ms": 5575,
+ "ms": 5097,
  "usage": {
-  "promptTokenCount": 1700,
-  "candidatesTokenCount": 885,
-  "totalTokenCount": 2585,
+  "promptTokenCount": 1708,
+  "candidatesTokenCount": 800,
+  "totalTokenCount": 2508,
   "trafficType": "ON_DEMAND",
   "promptTokensDetails": [
    {
     "modality": "IMAGE",
-    "tokenCount": 532
+    "tokenCount": 540
    },
    {
     "modality": "TEXT",
@@ -20,7 +20,7 @@
   "candidatesTokensDetails": [
    {
     "modality": "TEXT",
-    "tokenCount": 885
+    "tokenCount": 800
    }
   ]
  },
@@ -28,53 +28,53 @@
   "transcript": "",
   "items": [
    {
-    "name": "Sourdough bread",
-    "name_fr": "Pain au levain",
+    "name": "organic sourdough bread",
+    "name_fr": "Pain au levain BIO",
     "category": "bread",
-    "quantity": 6,
+    "quantity": 5,
     "unit_label": "loaf",
     "price_source": "label",
     "image_index": 0,
     "box_2d": [
-     221,
-     31,
-     359,
-     490
+     218,
+     5,
+     364,
+     521
     ],
     "facts": [
-     {
-      "attr": "weight_g",
-      "source": "label",
-      "quote": "800 g",
-      "box_2d": [
-       90,
-       31,
-       188,
-       290
-      ],
-      "image_index": 0,
-      "value_bool": null,
-      "value_int": 800
-     },
      {
       "attr": "organic",
       "source": "label",
       "quote": "BIO",
       "box_2d": [
-       90,
-       31,
-       188,
-       290
+       156,
+       58,
+       184,
+       94
       ],
       "image_index": 0,
       "value_bool": true,
       "value_int": null
+     },
+     {
+      "attr": "weight_g",
+      "source": "label",
+      "quote": "800 g",
+      "box_2d": [
+       117,
+       205,
+       149,
+       260
+      ],
+      "image_index": 0,
+      "value_bool": null,
+      "value_int": 800
      }
     ],
     "price_eur": 4.8
    },
    {
-    "name": "Country bread",
+    "name": "country bread",
     "name_fr": "Pain de campagne",
     "category": "bread",
     "quantity": 5,
@@ -82,17 +82,17 @@
     "price_source": "label",
     "image_index": 0,
     "box_2d": [
-     239,
-     546,
-     358,
-     966
+     232,
+     526,
+     363,
+     984
     ],
     "facts": [],
     "price_eur": 3.9
    },
    {
-    "name": "Rye bread",
-    "name_fr": "Pain de seigle",
+    "name": "gluten-free rye bread",
+    "name_fr": "Pain de seigle SANS GLUTEN",
     "category": "bread",
     "quantity": 4,
     "unit_label": "loaf",
@@ -100,9 +100,9 @@
     "image_index": 0,
     "box_2d": [
      620,
-     46,
-     769,
-     447
+     11,
+     796,
+     502
     ],
     "facts": [
      {
@@ -110,10 +110,10 @@
       "source": "label",
       "quote": "SANS GLUTEN",
       "box_2d": [
-       467,
-       47,
-       565,
-       329
+       546,
+       68,
+       572,
+       212
       ],
       "image_index": 0,
       "value_bool": true,
@@ -123,7 +123,7 @@
     "price_eur": 5.5
    },
    {
-    "name": "Pure butter croissant",
+    "name": "pure butter croissant",
     "name_fr": "Croissant pur beurre",
     "category": "pastry",
     "quantity": 8,
@@ -131,27 +131,12 @@
     "price_source": "label",
     "image_index": 0,
     "box_2d": [
-     632,
-     499,
-     759,
-     861
+     623,
+     513,
+     798,
+     990
     ],
-    "facts": [
-     {
-      "attr": "contains_dairy",
-      "source": "label",
-      "quote": "beurre",
-      "box_2d": [
-       489,
-       547,
-       587,
-       806
-      ],
-      "image_index": 0,
-      "value_bool": true,
-      "value_int": null
-     }
-    ],
+    "facts": [],
     "price_eur": 1.4
    }
   ],

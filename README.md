@@ -96,6 +96,14 @@ Criée is the merchant of record. Every call below runs against the sandbox in t
 | Stay in sync | `POST /v1/notifications/webhooks`, `verify-webhook-signature`, de-duplication by event id | `api/webhooks.py` |
 | Seller assistant | PayPal Agent Toolkit (`paypal-agent-toolkit`): `list_disputes`, `get_dispute`, `create_invoice`, `send_invoice`, `generate_invoice_qr_code`, `list_invoices`, `get_invoice` | `ai/assistant.py` |
 
+![One sale through Criée and the PayPal sandbox](docs/figures/settlement_flow.png)
+
+*One sale, end to end, as recorded on the ledger, with the times measured on the sandbox. `scripts/settlement_figures.py` draws it from `data/settlement_timings.json`.*
+
+![The 40 PayPal holds of one group order](docs/figures/burst.png)
+
+*The 40 PayPal holds of one group order, taken concurrently on the sandbox: all 40 held 2.6 s after the burst started. The same calls made one after another add up to 91 s.*
+
 Every mutating call carries a `PayPal-Request-Id` derived from the match it settles, so a retry returns the original result instead of charging twice. The seller's payout is the captured amount minus a 4% platform fee, minus any refund made after an earlier payout.
 
 ### AI

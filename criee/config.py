@@ -45,6 +45,7 @@ class Config:
     ai_daily_usd: float = 1.0
     ai_usd_in_per_m: float = 0.75
     ai_usd_out_per_m: float = 3.75
+    gemini_endpoint: str = "gemini-api"  # or "vertex"
 
     @property
     def paypal_live(self) -> bool:
@@ -79,6 +80,7 @@ def load(env_file: Optional[Path] = None) -> Config:
         ai_provider=e("CRIEE_AI_PROVIDER", "recorded"),
         gemini_api_key=e("GEMINI_API_KEY") or None,
         gemini_model=e("CRIEE_GEMINI_MODEL", "gemini-3.7-flash"),
+        gemini_endpoint=e("CRIEE_GEMINI_ENDPOINT", "gemini-api"),
         ai_until=date.fromisoformat(until) if until else None,
         ai_daily_cap=int(e("CRIEE_AI_DAILY_CAP", "400")),
         ai_per_visitor_hourly=int(e("CRIEE_AI_PER_VISITOR_HOURLY", "30")),

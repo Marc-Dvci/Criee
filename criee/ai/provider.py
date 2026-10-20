@@ -149,12 +149,15 @@ class AI:
         (d / f"{key}.json").write_text(json.dumps(value, ensure_ascii=False, indent=1), encoding="utf-8")
 
     async def _generate(self, body: dict) -> dict:
-        url = (f"https://aiplatform.googleapis.com/v1/publishers/google/models/{self.model}:generateContent"
-               f"?key={self.cfg.gemini_api_key}")
+        if self.cfg.gemini_endpoint == "vertex":
+            url = f"https://aiplatform.googleapis.com/v1/publishers/google/models/{self.model}:generateContent"
+        else:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        headers = {"x-goog-api-key": self.cfg.gemini_api_key}
         r = None
         for attempt in range(2):
             try:
-                r = await self._http.post(url, json=body)
+                r = await self._http.post(url, json=body, headers=headers)
                 break
             except (httpx.TimeoutException, httpx.TransportError) as e:
                 if attempt == 1:

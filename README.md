@@ -186,7 +186,7 @@ Standing wishes are present at every closing, while a markdown depends on passer
 ## Run it locally
 
 ```bash
-cp .env.example .env          # optional: PayPal sandbox app keys, a Gemini key on Vertex AI
+cp .env.example .env          # optional: PayPal sandbox app keys, a Gemini API key
 docker compose up --build     # http://localhost:8000
 ```
 
@@ -210,7 +210,7 @@ All of it, between 1 October and 12 November 2026: the sandbox probe, the cleari
 
 ## Tools
 
-PayPal REST APIs (Vault v3, Orders v2, Payments v2, Payouts, Customer Disputes, Webhooks) and the PayPal Agent Toolkit for Python · Gemini 3.7 Flash on Vertex AI · AG Grid and AG Charts (Community) · FastAPI, Pydantic, SQLite · React, Vite, TypeScript · py_webauthn and WebAuthn · Model Context Protocol Python SDK · ReportLab · Hypothesis and pytest · Playwright · AWS EC2 · Cloudflare Tunnel.
+PayPal REST APIs (Vault v3, Orders v2, Payments v2, Payouts, Customer Disputes, Webhooks) and the PayPal Agent Toolkit for Python · Gemini 3.7 Flash (Gemini API) · AG Grid and AG Charts (Community) · FastAPI, Pydantic, SQLite · React, Vite, TypeScript · py_webauthn and WebAuthn · Model Context Protocol Python SDK · ReportLab · Hypothesis and pytest · Playwright · AWS EC2 · Cloudflare Tunnel.
 
 ## License
 

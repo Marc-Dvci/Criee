@@ -134,3 +134,36 @@ def test_model_outage_falls_back(tmp_path):
 
     d = asyncio.run(compile_wish(Down(), "a baguette under 2 euros", HERE, "Gare", NOW))
     assert d.source == "rules" and d.terms is not None
+
+
+def test_busy_model_hands_over_to_the_next_in_the_chain(tmp_path):
+    import httpx
+    seen = []
+
+    def answer(request: httpx.Request) -> httpx.Response:
+        model = request.url.path.rsplit("/", 1)[1].split(":")[0]
+        seen.append(model)
+        if model == "main":
+            return httpx.Response(503, json={"error": {"code": 503}})
+        if model == "slow":
+            raise httpx.ReadTimeout("slow", request=request)
+        return httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": '{"ok": true}'}]}}],
+                                         "usageMetadata": {"promptTokenCount": 5, "candidatesTokenCount": 3}})
+
+    cfg = replace(make_config(tmp_path), ai_provider="gemini", gemini_api_key="k", gemini_model="main",
+                  gemini_fallback_models=("slow", "spare"), ai_daily_usd=5.0)
+    kv: dict = {}
+    ai = AI(cfg, kv.get, kv.__setitem__, cache_dir=tmp_path / "cache")
+    ai._http = httpx.AsyncClient(transport=httpx.MockTransport(answer))
+    out = asyncio.run(ai.json("probe", "s", ["fresh input"], {"type": "OBJECT"}))
+    assert out == {"ok": True} and seen == ["main", "slow", "spare"] and ai.last_model == "spare"
+
+    seen.clear()
+    cfg = replace(cfg, gemini_fallback_models=("slow",))
+    ai = AI(cfg, kv.get, kv.__setitem__, cache_dir=tmp_path / "cache2")
+    ai._http = httpx.AsyncClient(transport=httpx.MockTransport(answer))
+    try:
+        asyncio.run(ai.json("probe", "s", ["other input"], {"type": "OBJECT"}))
+        raise AssertionError("expected AIUnavailable")
+    except AIUnavailable as e:
+        assert "ReadTimeout" in str(e) and seen == ["main", "slow"]

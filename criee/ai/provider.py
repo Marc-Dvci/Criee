@@ -9,7 +9,6 @@ The API key stays on the server: no route returns it and the browser never calls
 """
 from __future__ import annotations
 
-import asyncio
 import base64
 import hashlib
 import json
@@ -131,6 +130,7 @@ class AI:
         self.cache_dir = cache_dir or cfg.data_dir / "ai_cache"
         self._http = httpx.AsyncClient(timeout=httpx.Timeout(40.0, connect=10.0))
         self.last_source: Optional[str] = None
+        self.last_model: Optional[str] = None
 
     @property
     def model(self) -> str:
@@ -150,33 +150,31 @@ class AI:
         (d / f"{key}.json").write_text(json.dumps(value, ensure_ascii=False, indent=1), encoding="utf-8")
 
     async def _generate(self, body: dict) -> dict:
-        if self.cfg.gemini_endpoint == "vertex":
-            url = f"https://aiplatform.googleapis.com/v1/publishers/google/models/{self.model}:generateContent"
-        else:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        """One answer from the first model in the chain that gives one. A model that is slow, busy or
+        refusing is skipped after one attempt, so a visitor waits at most one read timeout per model
+        before the deterministic path takes over."""
         headers = {"x-goog-api-key": self.cfg.gemini_api_key}
-        # one retry, only after a fast failure (refused connection, 500/503): a slow call is not repeated,
-        # so a visitor waits at most one read timeout before the deterministic path takes over
-        r = None
-        for attempt in range(2):
+        why = "no model"
+        for model in (self.model, *self.cfg.gemini_fallback_models):
+            if self.cfg.gemini_endpoint == "vertex":
+                url = f"https://aiplatform.googleapis.com/v1/publishers/google/models/{model}:generateContent"
+            else:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
             try:
-                r = await self._http.post(url, json=body, headers=headers)
-            except httpx.TimeoutException as e:
-                raise AIUnavailable(f"model unreachable: {type(e).__name__}")
-            except httpx.TransportError as e:
-                if attempt == 1:
-                    raise AIUnavailable(f"model unreachable: {type(e).__name__}")
-                await asyncio.sleep(1.5)
+                r = await self._http.post(url, json=body, headers=headers,
+                                          timeout=httpx.Timeout(self.cfg.gemini_timeout_s, connect=10.0))
+            except (httpx.TimeoutException, httpx.TransportError) as e:
+                why = f"model unreachable: {type(e).__name__}"
                 continue
-            if r.status_code in (500, 503) and attempt == 0:
-                await asyncio.sleep(1.5)
+            if r.status_code >= 500 or r.status_code == 429:
+                why = f"model busy {r.status_code}"
                 continue
-            break
-        if r.status_code >= 500 or r.status_code == 429:
-            raise AIUnavailable(f"model busy {r.status_code}")
-        if r.status_code >= 400:
-            raise AIUnavailable(f"model error {r.status_code}: {r.text[:300]}")
-        return r.json()
+            if r.status_code >= 400:
+                why = f"model error {r.status_code}: {r.text[:300]}"
+                continue
+            self.last_model = model
+            return r.json()
+        raise AIUnavailable(why)
 
     async def json(self, task: str, system: str, parts: list[Part], schema: dict, visitor: Optional[str] = None,
                    thinking: str = "LOW", record: bool = False) -> dict:
@@ -204,7 +202,7 @@ class AI:
             out = json.loads(text)
         except (KeyError, IndexError, ValueError) as e:
             raise AIUnavailable(f"unparseable model output: {e}")
-        self._store(task, key, {"task": task, "model": self.model, "ms": ms, "usage": res.get("usageMetadata"),
+        self._store(task, key, {"task": task, "model": self.last_model, "ms": ms, "usage": res.get("usageMetadata"),
                                 "output": out}, record)
         self.last_source = "live"
         return out
@@ -232,7 +230,7 @@ class AI:
             content = res["candidates"][0]["content"]
         except (KeyError, IndexError):
             raise AIUnavailable("empty model turn")
-        self._store(task, key, {"task": task, "model": self.model, "output": content}, record)
+        self._store(task, key, {"task": task, "model": self.last_model, "output": content}, record)
         self.last_source = "live"
         return content
 

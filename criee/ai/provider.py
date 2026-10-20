@@ -9,6 +9,7 @@ The API key stays on the server: no route returns it and the browser never calls
 """
 from __future__ import annotations
 
+import asyncio
 import base64
 import hashlib
 import json
@@ -128,7 +129,7 @@ class AI:
         self.cfg = cfg
         self.budget = Budget(cfg, kv_get, kv_set)
         self.cache_dir = cache_dir or cfg.data_dir / "ai_cache"
-        self._http = httpx.AsyncClient(timeout=httpx.Timeout(35.0, connect=10.0))
+        self._http = httpx.AsyncClient(timeout=httpx.Timeout(40.0, connect=10.0))
         self.last_source: Optional[str] = None
 
     @property
@@ -154,14 +155,23 @@ class AI:
         else:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
         headers = {"x-goog-api-key": self.cfg.gemini_api_key}
+        # one retry, only after a fast failure (refused connection, 500/503): a slow call is not repeated,
+        # so a visitor waits at most one read timeout before the deterministic path takes over
         r = None
         for attempt in range(2):
             try:
                 r = await self._http.post(url, json=body, headers=headers)
-                break
-            except (httpx.TimeoutException, httpx.TransportError) as e:
+            except httpx.TimeoutException as e:
+                raise AIUnavailable(f"model unreachable: {type(e).__name__}")
+            except httpx.TransportError as e:
                 if attempt == 1:
                     raise AIUnavailable(f"model unreachable: {type(e).__name__}")
+                await asyncio.sleep(1.5)
+                continue
+            if r.status_code in (500, 503) and attempt == 0:
+                await asyncio.sleep(1.5)
+                continue
+            break
         if r.status_code >= 500 or r.status_code == 429:
             raise AIUnavailable(f"model busy {r.status_code}")
         if r.status_code >= 400:

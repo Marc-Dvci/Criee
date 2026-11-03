@@ -1,4 +1,4 @@
-FROM node:22-alpine AS web
+FROM node:24-alpine AS web
 WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
@@ -8,9 +8,10 @@ RUN npm run build
 FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 CRIEE_DATA_DIR=/data
 WORKDIR /app
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md requirements-toolkit.txt ./
 COPY criee/ criee/
 RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir --no-deps -r requirements-toolkit.txt
 COPY data/ data/
 COPY --from=web /web/dist web/dist
 RUN useradd -r -u 10001 criee && mkdir -p /data && chown criee /data

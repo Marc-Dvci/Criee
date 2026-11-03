@@ -27,6 +27,7 @@ The 40-hold headline uses `data/settlement_timings.json`: 2,627 ms measured sand
 6. Seller photo object URLs are released instead of being recreated and leaked on every render. Signing-link loading waits for session discovery and handles account changes.
 7. A generated market exposed a pre-existing weekly-cap violation across a pending group commitment and a closing auction. Long-group commitments now reserve count and budget, quorum excludes expired or otherwise ineligible wishes, and waitlist replacements recheck eligibility at the time the failed hold is replaced. The reservation index is rebuilt from the existing events and avoids scanning historical lots on each eligibility check.
 8. Group capture now waits for the target to be backed by successful PayPal holds, including a waitlist replacement after a decline. A group that is still underfunded at its deadline fails and releases the other holds instead of charging those buyers.
+9. Fresh Linux CI exposed upstream PayPal Agent Toolkit metadata that pins unused framework adapters, including a CrewAI version incompatible with Python 3.13. Installation now separates the pinned genuine toolkit core from those adapters, declares its shared dependencies explicitly and tests the real invoice/dispute tool declarations. CI, local setup and both Docker builds use the same installation path.
 
 ## Validation and practical limits
 
@@ -36,7 +37,7 @@ Local validation on 3 November 2026:
 
 | Check | Result |
 |---|---|
-| Python 3.12 backend and generated-property suite | 80 tests; property coverage raised to 500 generated examples per property for release and CI |
+| Backend and generated-property suite | 81 tests; property coverage raised to 500 generated examples per property for release and CI |
 | Production TypeScript and Vite build on Node 24 | Passed |
 | Chromium journey, interrupted audit recovery, mobile width and reload/resume | Passed; no uncaught browser errors |
 | Real PayPal sandbox OAuth client token, v6 SDK loading, vault eligibility and official button | Passed with `--live-paypal-ui`; no wallet approval or payment performed |

@@ -1,0 +1,4 @@
+# Criée uses PayPal's shared API/schema core directly from Gemini function calling.
+# Install with --no-deps: upstream 1.11.0 hard-pins unused CrewAI/LangChain/Agents adapters.
+# Shared-core dependencies (requests, httpx, pydantic, python-dotenv) are in pyproject.toml.
+paypal-agent-toolkit==1.11.0

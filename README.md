@@ -214,6 +214,7 @@ For development:
 
 ```bash
 uv venv --python 3.12 && uv pip install -e ".[dev]"
+uv pip install --no-deps -r requirements-toolkit.txt         # PayPal's shared API/schema core
 uvicorn criee.api.app:create_app --factory --reload      # API on :8000
 cd web && npm ci && npm run dev                             # UI on :5173, proxied to the API
 pytest                                                      # backend and property tests
@@ -223,6 +224,8 @@ python -m criee.sim --seeds 20 --out data/sim/results.json  # simulation
 ```
 
 The hosted instance runs the same image on AWS (Amazon Linux 2023, Graviton) behind a Cloudflare tunnel. The [deployment procedure](docs/DEPLOYMENT.md) builds before switching containers, backs up SQLite, preserves the signed ledger and saved wallets, and verifies the deployed revision with rollback on startup failure.
+
+PayPal's published [Agent Toolkit 1.11.0](https://pypi.org/project/paypal-agent-toolkit/1.11.0/) hard-pins old CrewAI, LangChain and OpenAI Agents adapters. Criée calls its shared PayPal API and schemas directly from Gemini, so CI and both Docker images install that pinned package with `--no-deps`; the shared core's dependencies are declared in `pyproject.toml`. The test suite checks the real invoice/dispute tool declarations on a clean install. No adapter code is vendored or replaced.
 
 ## What I built during the hackathon
 

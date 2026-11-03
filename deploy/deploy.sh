@@ -40,9 +40,11 @@ rollback() {
   echo 'Startup failed; restoring the previous container against the unchanged data volume' >&2
   sudo docker rm -f criee >/dev/null 2>&1 || true
   sudo docker rename "$previous" criee
+  sudo docker update --restart=always criee >/dev/null
   sudo docker start criee
 }
 trap rollback ERR
+sudo docker update --restart=no "$previous" >/dev/null
 sudo docker run -d --name criee --restart always -p 127.0.0.1:8000:8000 \
   -v /var/lib/criee/data:/data --env-file /opt/criee/criee.env \
   -e "CRIEE_RELEASE_SHA=$revision" --label "org.opencontainers.image.revision=$revision" "criee:$revision"

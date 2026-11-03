@@ -12,7 +12,7 @@ Built for *Build What's Next with PayPal and AI*. Everything below runs on the P
 | | |
 |---|---|
 | Hosted demo | https://marc-dvci.github.io/Criee/ (redirects to the live instance) |
-| Video (2:30) | https://youtu.be/8MBAmKqM3Bs |
+| Video (2:30) | https://youtu.be/-QVhwYTAiZY |
 | Guided judge tour | [**Take the guided tour**](https://marc-dvci.github.io/Criee/?to=/tour): buyer → seller → pickup → payment proof; roles switch for you |
 | Free exploration | **Play both sides** creates a buyer with a demo wallet and a seller with a stall |
 | Local run | `docker compose up`, then http://localhost:8000. Runs with or without keys |

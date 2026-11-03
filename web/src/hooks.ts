@@ -10,6 +10,9 @@ let connected = false
 const connListeners = new Set<(c: boolean) => void>()
 
 function ensureSource() {
+  // Cloudflare Quick Tunnels buffer SSE indefinitely. useLive's regular JSON polls
+  // keep these demos current without opening a connection the proxy cannot deliver.
+  if (window.location.hostname.endsWith('.trycloudflare.com')) return
   if (source) return
   source = new EventSource('/api/stream')
   source.addEventListener('ledger', (e) => {

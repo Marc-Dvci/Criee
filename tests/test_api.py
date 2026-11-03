@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import json
+import time
 
 import pytest
 from cryptography.hazmat.primitives import hashes
@@ -211,6 +212,38 @@ def test_ledger_stream_has_progress_scope_and_a_terminal_result(client):
     assert client.get("/api/ledger/verify/stream?recent=0").status_code == 422
     assert client.get("/api/ledger/verify/stream?recent=1001").status_code == 422
     assert client.get("/api/ledger?limit=-1").status_code == 422
+    assert client.post("/api/ledger/verify/jobs?recent=0").status_code == 422
+    assert client.get("/api/ledger/verify/jobs/missing").status_code == 404
+
+
+def test_json_audit_progress_is_visible_before_completion_and_shares_running_work(client, monkeypatch):
+    for i in range(768):
+        client.core.emit("test", {"i": i})
+    original = client.core.ledger.signer.verify
+
+    def slow_verify(*args):
+        time.sleep(0.001)
+        return original(*args)
+
+    monkeypatch.setattr(client.core.ledger.signer, "verify", slow_verify)
+    start = client.post("/api/ledger/verify/jobs")
+    assert start.status_code == 200 and start.headers["cache-control"] == "no-store"
+    first = start.json()
+    assert not first["done"] and first["checked"] == 0 and first["total"] == 768
+    assert client.post("/api/ledger/verify/jobs").json()["id"] == first["id"]
+    client.post("/api/session", json={"role": "buyer"}).raise_for_status()
+    assert client.core.ledger.head[0] > first["to_seq"], "the market must remain responsive during the audit"
+    intermediate = False
+    deadline = time.monotonic() + 8
+    while time.monotonic() < deadline:
+        result = client.get(f"/api/ledger/verify/jobs/{first['id']}").json()
+        intermediate |= 0 < result["checked"] < result["total"] and not result["done"]
+        if result["done"]:
+            break
+        time.sleep(0.01)
+    assert intermediate, "progress must be observable before the final result, without relying on SSE"
+    assert result["done"] and result["ok"] and result["events"] == 768
+    assert result["snapshot_head"] == first["snapshot_head"] and result["scope"] == "full"
 
 
 def test_public_ledger_hides_account_data_and_private_wish_details(client):

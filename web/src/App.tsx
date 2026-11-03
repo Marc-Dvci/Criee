@@ -42,8 +42,8 @@ function TopBar({ session }: { session: Session }) {
         <NavLink to="/console">Console</NavLink>
         <NavLink to="/ledger">Ledger</NavLink>
       </nav>
-      <div className="status-pill" title={st ? `PayPal ${st.paypal} · ledger ${st.ledger.events} events` : ''}>
-        <span className={`dot ${live ? '' : 'off'}`} />
+      <div className="status-pill" title={st ? `PayPal ${st.paypal} · ledger ${st.ledger.events} events · ${live ? 'live stream' : 'market refreshes every 4 seconds'}` : ''}>
+        <span className={`dot ${live ? '' : st ? 'polling' : 'off'}`} aria-label={live ? 'Live stream connected' : st ? 'Market refreshes every 4 seconds' : 'Connecting'} />
         <span className="hide-sm">{st ? `PayPal ${st.paypal}` : 'connecting'}</span>
         {session.account && <span className="chip">{session.account.handle}</span>}
       </div>

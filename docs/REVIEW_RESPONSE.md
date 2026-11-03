@@ -10,7 +10,7 @@
 | Shared wallet hides PayPal | Official v6 Save PayPal button remains visible even when a demo wallet is already saved; direct approval fallback | Judges can see PayPal's own approval without losing the credential-free demo path |
 | Competitors name current PayPal products | Implemented v6 Save PayPal, with documented Vault/Orders/Payments/Payouts/Disputes/Toolkit mapping | Adds a current product that directly serves Criée's existing use case |
 | Engineering proof is hard to find | GitHub Actions workflow, live CI badge, threat model, source/timing links and a visible 40-hold result | Makes quality claims inspectable instead of asking judges to trust prose |
-| Whole-chain check took 21 seconds without feedback | Bounded streaming verification, exact snapshot, progress, elapsed time and a separate recent-200 check | Gives a fast check and a complete audit, with explicit scope for each |
+| Whole-chain check took 21 seconds without feedback | Bounded background audit jobs, JSON progress polling, exact snapshot, elapsed time and a separate recent-200 check | Gives a fast check and a complete audit, including behind buffering proxies |
 | Setup requires camera or repository download | One-click sample shelf photo in the seller UI, sent through the same upload/read path | Works on desktop without camera permissions or finding a file |
 
 Do not add unrelated subscriptions, Store Sync, Agent Ready or protocol badges solely for name recognition. Current [PayPal v6 Save PayPal documentation](https://developer.paypal.com/sdk/save-without-purchase/paypal/) covers the implemented flow. [Agent Ready](https://developer.paypal.com/agent-ready/overview/) describes separate integration paths; Criée does not claim to implement them. Future distribution integration can be described as future work, with that boundary explicit.
@@ -28,6 +28,7 @@ The 40-hold headline uses `data/settlement_timings.json`: 2,627 ms measured sand
 7. A generated market exposed a pre-existing weekly-cap violation across a pending group commitment and a closing auction. Long-group commitments now reserve count and budget, quorum excludes expired or otherwise ineligible wishes, and waitlist replacements recheck eligibility at the time the failed hold is replaced. The reservation index is rebuilt from the existing events and avoids scanning historical lots on each eligibility check.
 8. Group capture now waits for the target to be backed by successful PayPal holds, including a waitlist replacement after a decline. A group that is still underfunded at its deadline fails and releases the other holds instead of charging those buyers.
 9. Fresh Linux CI exposed upstream PayPal Agent Toolkit metadata that pins unused framework adapters, including a CrewAI version incompatible with Python 3.13. Installation now separates the pinned genuine toolkit core from those adapters, declares its shared dependencies explicitly and tests the real invoice/dispute tool declarations. CI, local setup and both Docker builds use the same installation path.
+10. A final hosted check found that [Cloudflare Quick Tunnels do not support SSE](https://developers.cloudflare.com/tunnel/get-started/quick-tunnels/). Counting received audit frames had verified the chain but had not proved that judges saw progress before completion. The UI now polls short JSON responses from bounded, shared audit jobs. A regression test requires intermediate progress before completion, and the public browser check requires the progress bar to advance while the audit is still running. Market updates on the quick-tunnel host use the existing regular JSON refreshes and an explicit refresh indicator instead of opening an undeliverable event stream.
 
 ## Validation and practical limits
 
@@ -37,7 +38,7 @@ Local validation on 3 November 2026:
 
 | Check | Result |
 |---|---|
-| Backend and generated-property suite | 81 tests; property coverage raised to 500 generated examples per property for release and CI |
+| Backend and generated-property suite | 82 tests; property coverage raised to 500 generated examples per property for release and CI |
 | Production TypeScript and Vite build on Node 24 | Passed |
 | Chromium journey, interrupted audit recovery, mobile width and reload/resume | Passed; no uncaught browser errors |
 | Real PayPal sandbox OAuth client token, v6 SDK loading, vault eligibility and official button | Passed with `--live-paypal-ui`; no wallet approval or payment performed |
@@ -53,4 +54,4 @@ The tour's primary action now opens the current task, while continuing to the ne
 
 The deployment script now builds before replacing the running service, backs up SQLite, retains the previous container for rollback, preserves existing server credentials and data, and verifies both the deployed commit and a pre-deployment ledger checkpoint. See [deployment instructions](DEPLOYMENT.md). GitHub CI and public-host verification provide the final release evidence; the badge reflects actual workflow results. No contest outcome can be guaranteed.
 
-The hosted release was checked on 3 November: the recent-200 audit finished in 0.41 s; the full 121,678-event chain verified in 21.96 s with 478 progress frames. Desktop/mobile checks passed for the tour, official PayPal button, sample photo, pickup keypad, console and title cleanup, with no uncaught browser errors. GitHub CI passed on clean Python 3.12/3.13 environments and the production Chromium build. The original ledger checkpoint was preserved, and rollback containers are kept stopped across daemon restarts.
+The hosted release was checked on 3 November: recent-200 checks completed in 0.25–0.41 s, and the full chain of more than 121,000 events verified in about 22 s. The final progress-delivery check requires visible intermediate progress, rather than treating completed SSE frame counts as proof of live delivery. Desktop/mobile checks cover the tour, official PayPal button, sample photo, pickup keypad, console and title cleanup. The original ledger checkpoint is preserved, and rollback containers are kept stopped across daemon restarts.

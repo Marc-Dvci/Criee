@@ -30,6 +30,7 @@ from ..domain import (Category, ClearingMode, Crop, Fact, GeoPoint, LotListing, 
                       parse_money, utcnow)
 from ..engine import MatchStatus
 from ..settlement.paypal import FakePayPal, PayPalClient
+from ..verification import VerificationJobs
 from . import auth
 from .views import board, lot_view, match_view, nearby_wishes, shop_of, wish_view
 
@@ -117,6 +118,7 @@ def build_core(cfg: Config) -> Core:
 def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_loops: bool = True) -> FastAPI:
     cfg = cfg or load()
     core = core or build_core(cfg)
+    verification = VerificationJobs(core.ledger)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -138,6 +140,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
             yield
         for t in extra:
             t.cancel()
+        await verification.close()
         await core.stop()
 
     app = FastAPI(title="Criée", lifespan=lifespan, docs_url="/api/docs", openapi_url="/api/openapi.json")
@@ -653,6 +656,22 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
                 yield 'data: {"done": true, "ok": false, "reason": "verification unavailable"}\n\n'
         return StreamingResponse(frames(), media_type="text/event-stream",
                                  headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
+
+    @app.post("/api/ledger/verify/jobs")
+    async def start_verification(recent: Optional[int] = Query(default=None, ge=1, le=1000)) -> JSONResponse:
+        try:
+            progress = await verification.start(recent)
+        except RuntimeError as e:
+            raise HTTPException(429, str(e))
+        return JSONResponse(progress, headers={"Cache-Control": "no-store"})
+
+    @app.get("/api/ledger/verify/jobs/{job_id}")
+    async def verification_progress(job_id: str) -> JSONResponse:
+        try:
+            progress = verification.get(job_id)
+        except KeyError:
+            raise HTTPException(404, "Audit expired or server restarted. Please run the check again.")
+        return JSONResponse(progress, headers={"Cache-Control": "no-store"})
 
     @app.get("/api/samples/shelf.jpg")
     def sample_shelf() -> FileResponse:

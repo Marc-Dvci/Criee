@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../api'
 import { Spinner } from '../components'
-import { useLedger } from '../hooks'
+import { useConnected, useLedger } from '../hooks'
 
 type Ev = { seq: number; at: string; type: string; body: any; prev: string; hash: string; sig: string }
 type Verification = {
+  id: string
   done: boolean; ok?: boolean; checked: number; total: number; scope: 'recent' | 'full'
   from_seq: number; to_seq: number; head?: string; public_key?: string; seq?: number; reason?: string
 }
@@ -33,8 +34,10 @@ export default function Ledger() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [elapsed, setElapsed] = useState(0)
-  const stream = useRef<EventSource | null>(null)
+  const poll = useRef<number | null>(null)
+  const generation = useRef(0)
   const refresh = useRef<number | null>(null)
+  const live = useConnected()
   const started = useRef(0)
   const [filter, setFilter] = useState('')
   const load = async () => {
@@ -45,8 +48,17 @@ export default function Ledger() {
   }
   useEffect(() => {
     void load().catch((e: Error) => setError(e.message))
-    return () => { stream.current?.close(); if (refresh.current !== null) window.clearTimeout(refresh.current) }
+    return () => {
+      generation.current += 1
+      if (poll.current !== null) window.clearTimeout(poll.current)
+      if (refresh.current !== null) window.clearTimeout(refresh.current)
+    }
   }, [])
+  useEffect(() => {
+    if (live) return
+    const timer = window.setInterval(() => { void load().catch((e: Error) => setError(e.message)) }, 4000)
+    return () => window.clearInterval(timer)
+  }, [live])
   useEffect(() => {
     if (!busy) return
     const timer = window.setInterval(() => setElapsed((performance.now() - started.current) / 1000), 100)
@@ -61,18 +73,23 @@ export default function Ledger() {
     }, 250)
   })
   const run = (full: boolean) => {
-    stream.current?.close(); setBusy(true); setVerify(null); setError(''); setElapsed(0)
+    if (poll.current !== null) window.clearTimeout(poll.current)
+    const request = ++generation.current
+    setBusy(true); setVerify(null); setError(''); setElapsed(0)
     started.current = performance.now()
-    const source = new EventSource(`/api/ledger/verify/stream${full ? '' : '?recent=200'}`)
-    stream.current = source
-    source.onmessage = (e) => {
+    const update = async (path: string, start = false) => {
       try {
-        const result = JSON.parse(e.data) as Verification
+        const result = start ? await api.post<Verification>(path) : await api.get<Verification>(path)
+        if (generation.current !== request) return
         setVerify(result)
-        if (result.done) { source.close(); setBusy(false); setElapsed((performance.now() - started.current) / 1000) }
-      } catch { source.close(); setBusy(false); setError('Verification returned an unreadable result. Please retry.') }
+        if (result.done) { setBusy(false); setElapsed((performance.now() - started.current) / 1000) }
+        else poll.current = window.setTimeout(() => { void update(`/api/ledger/verify/jobs/${result.id}`) }, start ? 0 : 350)
+      } catch (e: unknown) {
+        if (generation.current !== request) return
+        setBusy(false); setError(`Verification connection interrupted. Please retry; no result has been certified. ${(e as Error).message}`)
+      }
     }
-    source.onerror = () => { source.close(); setBusy(false); setError('Verification connection interrupted. Please retry; no result has been certified.') }
+    void update(`/api/ledger/verify/jobs${full ? '' : '?recent=200'}`, true)
   }
   const shown = events.filter((e) => !filter || e.type.startsWith(filter))
   return (

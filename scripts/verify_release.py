@@ -13,18 +13,20 @@ import urllib.request
 
 def audit(base: str, suffix: str, expected_scope: str):
     started = time.perf_counter()
-    frames = []
-    with urllib.request.urlopen(base + "/api/ledger/verify/stream" + suffix, timeout=90) as response:
-        for line in response:
-            if line.startswith(b"data: "):
-                data = json.loads(line[6:])
-                frames.append(data)
-                if data.get("done"):
-                    break
-    assert len(frames) >= 2 and frames[0]["checked"] == 0, "No verification progress"
-    result = frames[-1]
+    request = urllib.request.Request(base + "/api/ledger/verify/jobs" + suffix,
+                                     data=b"{}", headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(request, timeout=15) as response:
+        first = json.load(response)
+    assert not first["done"] and first["checked"] == 0
+    result = first
+    while not result["done"]:
+        assert time.perf_counter() - started < 120, "Audit timed out"
+        with urllib.request.urlopen(base + "/api/ledger/verify/jobs/" + first["id"], timeout=15) as response:
+            result = json.load(response)
+        if not result["done"]:
+            time.sleep(0.2)
     assert result.get("done") and result.get("ok") and result["scope"] == expected_scope, result
-    print(f"PASS: public {expected_scope} audit, {result['events']:,} events, {len(frames)} progress frames, {time.perf_counter() - started:.2f}s", flush=True)
+    print(f"PASS: public {expected_scope} audit, {result['events']:,} events, {time.perf_counter() - started:.2f}s", flush=True)
 
 
 def main():
@@ -46,12 +48,13 @@ def main():
     with urllib.request.urlopen(base + "/api/samples/shelf.jpg", timeout=20) as response:
         assert response.read(2) == b"\xff\xd8"
     audit(base, "?recent=200", "recent")
-    audit(base, "", "full")
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True, channel=args.channel)
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
         errors = []
+        stream_requests = []
         page.on("pageerror", lambda error: errors.append(str(error)))
+        page.on("request", lambda request: stream_requests.append(request.url) if "/api/stream" in request.url else None)
         page.goto(base, wait_until="domcontentloaded")
         expect(page.get_by_role("link", name="Take the guided tour", exact=True)).to_be_visible()
         if args.out:
@@ -75,6 +78,22 @@ def main():
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Proof overflows on mobile"
         page.get_by_role("button", name="Quick check · latest 200", exact=True).click()
         expect(page.get_by_text("Recent segment verified:")).to_be_visible(timeout=15000)
+        started = time.perf_counter()
+        with page.expect_response(lambda response: response.url.endswith('/api/ledger/verify/jobs') and response.request.method == 'POST') as initial:
+            page.get_by_role("button", name="Verify the whole chain", exact=True).click()
+        job = initial.value.json()
+        page.wait_for_function("(() => { const p = document.querySelector('.verify-progress'); return p && p.value > 0 && p.value < p.max })()", timeout=20000)
+        print("PASS: hosted audit progress changes on screen before completion", flush=True)
+        if args.out:
+            page.locator('.verify-progress').scroll_into_view_if_needed()
+            page.screenshot(path=str(args.out / "live-audit-progress.png"))
+        expect(page.get_by_text("Full chain verified:")).to_be_visible(timeout=90000)
+        result = page.request.get(base + '/api/ledger/verify/jobs/' + job['id']).json()
+        assert result['ok'] and result['scope'] == 'full' and result['checked'] == result['total']
+        print(f"PASS: public full audit, {result['events']:,} events, {time.perf_counter() - started:.2f}s", flush=True)
+        if 'trycloudflare.com' in base:
+            assert not stream_requests, "The quick-tunnel demo must use its supported JSON polling transport"
+            expect(page.locator('.status-pill .dot')).to_have_attribute('aria-label', 'Market refreshes every 4 seconds')
         page.set_viewport_size({"width": 1440, "height": 1000})
         page.get_by_role("link", name="Inspect the console", exact=False).click()
         if args.out:

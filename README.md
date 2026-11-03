@@ -153,6 +153,8 @@ The ledger (`criee/ledger.py`) is append-only SQLite with triggers that refuse u
 
 [GitHub Actions](.github/workflows/ci.yml) runs the backend suite on Python 3.12 and 3.13, builds the production TypeScript app with Node 24, then drives the judge journey in Chromium. CI needs no PayPal or Gemini secrets. The badge above reflects actual GitHub workflow results once the workflow is pushed; it is not a sandbox certification. See the [threat model](docs/THREAT_MODEL.md) for trust boundaries and limitations.
 
+Audit progress uses bounded background jobs and short JSON polls, so it remains visible through the demo's Cloudflare Quick Tunnel. That host uses regular market refreshes because Quick Tunnels buffer SSE; direct event streams remain available for supported hosts and clients. Release verification checks that the progress bar advances before the audit finishes.
+
 ## Design
 
 Three surfaces share one design language: the fish-auction hall and the station departures board. Dark slate, chalk white, and one amber signal for "sold".

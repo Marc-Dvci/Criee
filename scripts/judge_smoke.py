@@ -186,6 +186,21 @@ def main():
                 page.get_by_role("button", name="Verify the whole chain", exact=True).click()
                 expect(page.get_by_text("Full chain verified:")).to_be_visible(timeout=20000)
                 print("PASS: recent and full ledger verification in the production build")
+                # Emulate a proxy that cannot stream: only short JSON responses carry progress.
+                finish = [False]
+                progress = {"id": "browser-progress-test", "scope": "full", "total": 1000,
+                            "from_seq": 1, "to_seq": 1000, "checked": 0, "done": False}
+                page.route("**/api/ledger/verify/jobs", lambda route: route.fulfill(json=progress))
+                page.route("**/api/ledger/verify/jobs/browser-progress-test", lambda route: route.fulfill(json={
+                    **progress, "checked": 1000 if finish[0] else 400, "done": finish[0], "ok": finish[0]}))
+                page.get_by_role("button", name="Verify the whole chain", exact=True).click()
+                page.wait_for_function("document.querySelector('.verify-progress')?.value === 400")
+                expect(page.get_by_role("button", name="Verify the whole chain", exact=True)).to_be_disabled()
+                finish[0] = True
+                expect(page.get_by_text("Full chain verified:")).to_be_visible(timeout=10000)
+                page.unroute("**/api/ledger/verify/jobs")
+                page.unroute("**/api/ledger/verify/jobs/browser-progress-test")
+                print("PASS: visible intermediate audit progress over short JSON responses")
                 page.reload()
                 expect(page.get_by_role("heading", name="Inspect the proof", exact=True)).to_be_visible()
                 expect(page.locator("h1").filter(has_text="· console")).to_be_visible(timeout=15000)
@@ -193,7 +208,7 @@ def main():
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Mobile layout overflows"
                 if args.out:
                     page.screenshot(path=str(args.out / "tour-mobile.png"))
-                page.route("**/api/ledger/verify/stream?recent=200", lambda route: route.fulfill(status=503, body="Unavailable"))
+                page.route("**/api/ledger/verify/jobs?recent=200", lambda route: route.fulfill(status=503, body='{"detail":"Unavailable"}', content_type="application/json"))
                 page.get_by_role("button", name="Quick check · latest 200", exact=True).click()
                 expect(page.get_by_role("alert")).to_contain_text("connection interrupted", timeout=10000)
                 expect(page.get_by_role("button", name="Quick check · latest 200", exact=True)).to_be_enabled()

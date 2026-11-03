@@ -55,7 +55,9 @@ window.paypal = {createInstance: async (options) => {
       window.sdkCallbacks = callbacks;
       return {start: async (options, promise) => {
         const token = await promise;
-        await callbacks.onApprove({vaultSetupToken: token.setupToken});
+        // The real v6 SDK rejects with "no setup token provided" unless the key is vaultSetupToken.
+        if (!token || !token.vaultSetupToken) throw new Error('no setup token provided');
+        await callbacks.onApprove({vaultSetupToken: token.vaultSetupToken});
       }};
     }
   };

@@ -12,7 +12,7 @@ Built for *Build What's Next with PayPal and AI*. Everything below runs on the P
 | | |
 |---|---|
 | Hosted demo | https://marc-dvci.github.io/Criee/ (redirects to the live instance) |
-| Video (2:30) | https://youtu.be/-QVhwYTAiZY |
+| Video (2:23) | https://youtu.be/-QVhwYTAiZY |
 | Guided judge tour | [**Take the guided tour**](https://marc-dvci.github.io/Criee/?to=/tour): buyer → seller → pickup → payment proof; roles switch for you |
 | Free exploration | **Play both sides** creates a buyer with a demo wallet and a seller with a stall |
 | Local run | `docker compose up`, then http://localhost:8000. Runs with or without keys |
@@ -119,7 +119,7 @@ Criée is the merchant of record. Every call below runs against the sandbox in t
 
 ![The 40 PayPal holds of one group order](docs/figures/burst.png)
 
-*The 40 PayPal holds of one group order, taken concurrently on the sandbox: all 40 held 2.6 s after the burst started. The same calls made one after another add up to 91 s.*
+*The 40 PayPal holds of one group order, taken concurrently on the sandbox: all 40 held 2.6 s after the burst started. Their individual durations sum to 91 s, an estimate of the serial time.*
 
 Every mutating call carries a `PayPal-Request-Id` derived from the match it settles, so a retry returns the original result instead of charging twice. The seller's payout is the captured amount minus a 4% platform fee, minus any refund made after an earlier payout.
 

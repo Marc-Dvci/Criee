@@ -4,7 +4,7 @@ import { api } from './api'
 import { Spinner } from './components'
 import { toast } from './hooks'
 
-type SaveSession = { start: (options: { presentationMode: string }, token: Promise<{ setupToken: string }>) => Promise<void> }
+type SaveSession = { start: (options: { presentationMode: string }, token: Promise<{ vaultSetupToken: string }>) => Promise<void> }
 type SDK = {
   createInstance: (options: { clientToken: string; components: string[]; pageType: string }) => Promise<{
     findEligibleMethods: (options: { currencyCode: string; paymentFlow: string }) => Promise<{ isEligible: (method: string) => boolean }>
@@ -82,7 +82,7 @@ export default function PayPalSetup({ session }: { session: Session }) {
       if (busy || !save.current) return
       setBusy('paypal'); setError('')
       // Start synchronously in the click handler to retain browser popup permission.
-      const token = api.post<{ setup_token: string }>('/api/vault/start').then((r) => ({ setupToken: r.setup_token }))
+      const token = api.post<{ setup_token: string }>('/api/vault/start').then((r) => ({ vaultSetupToken: r.setup_token }))
       void save.current.start({ presentationMode: 'auto' }, token).catch(() => {
         setBusy(''); setError('PayPal could not open. Use the direct approval link below.')
       })

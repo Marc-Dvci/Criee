@@ -58,6 +58,7 @@ class PayPalAPI(Protocol):
     async def payout(self, receiver_email: str, cents: int, ref: str, note: str) -> PayPalResult: ...
     async def get_payout(self, batch_id: str) -> PayPalResult: ...
     async def setup_token(self, return_url: str, cancel_url: str, description: str, ref: str) -> PayPalResult: ...
+    async def browser_client_token(self) -> PayPalResult: ...
     async def get_setup_token(self, setup_token_id: str) -> PayPalResult: ...
     async def payment_token(self, setup_token_id: str, ref: str) -> PayPalResult: ...
     async def list_disputes(self) -> PayPalResult: ...
@@ -174,6 +175,15 @@ class PayPalClient:
         return await self.call("GET", f"/v1/payments/payouts/{batch_id}")
 
     # -- vault ---------------------------------------------------------------------------
+
+    async def browser_client_token(self) -> PayPalResult:
+        # This restricted token is distinct from the server's privileged access token.
+        t0 = time.perf_counter()
+        response = await self._http.post(
+            f"{self.base}/v1/oauth2/token", auth=(self.client_id, self.secret),
+            data={"grant_type": "client_credentials", "response_type": "client_token"})
+        return PayPalResult(response.status_code, response.json(), response.headers.get("paypal-debug-id"),
+                            (time.perf_counter() - t0) * 1000)
 
     async def setup_token(self, return_url: str, cancel_url: str, description: str, ref: str) -> PayPalResult:
         return await self.call("POST", "/v3/vault/setup-tokens", {
@@ -330,6 +340,9 @@ class FakePayPal:
         st = self._id("setup", ref)
         return self._ok({"id": st, "status": "PAYER_ACTION_REQUIRED",
                          "links": [{"rel": "approve", "href": f"{return_url}?approval_token_id={st}"}]})
+
+    async def browser_client_token(self):
+        return self._ok({"access_token": "OFFLINE-CLIENT-TOKEN", "expires_in": 900}, 200)
 
     async def get_setup_token(self, setup_token_id):
         return self._ok({"id": setup_token_id, "status": "APPROVED"}, 200)

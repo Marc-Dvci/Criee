@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from '../api'
 import { Spinner } from '../components'
 import { useLedger } from '../hooks'
 
 type Ev = { seq: number; at: string; type: string; body: any; prev: string; hash: string; sig: string }
+type Verification = {
+  done: boolean; ok?: boolean; checked: number; total: number; scope: 'recent' | 'full'
+  from_seq: number; to_seq: number; head?: string; public_key?: string; seq?: number; reason?: string
+}
 
 function summary(e: Ev): string {
   const b = e.body
@@ -25,8 +29,13 @@ function summary(e: Ev): string {
 
 export default function Ledger() {
   const [events, setEvents] = useState<Ev[]>([])
-  const [verify, setVerify] = useState<any>(null)
+  const [verify, setVerify] = useState<Verification | null>(null)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [elapsed, setElapsed] = useState(0)
+  const stream = useRef<EventSource | null>(null)
+  const refresh = useRef<number | null>(null)
+  const started = useRef(0)
   const [filter, setFilter] = useState('')
   const load = async () => {
     const head = await api.get<{ events: Ev[]; head: [number, string] }>('/api/ledger?after=0&limit=1')
@@ -34,22 +43,58 @@ export default function Ledger() {
     const r = await api.get<{ events: Ev[] }>(`/api/ledger?after=${after}&limit=150`)
     setEvents(r.events.reverse())
   }
-  useEffect(() => { load() }, [])
-  useLedger(async (p) => {
-    const r = await api.get<{ events: Ev[] }>(`/api/ledger?after=${p.seq - 1}&limit=1`)
-    setEvents((cur) => (cur.some((e) => e.seq === p.seq) ? cur : [...r.events, ...cur].slice(0, 600)))
+  useEffect(() => {
+    void load().catch((e: Error) => setError(e.message))
+    return () => { stream.current?.close(); if (refresh.current !== null) window.clearTimeout(refresh.current) }
+  }, [])
+  useEffect(() => {
+    if (!busy) return
+    const timer = window.setInterval(() => setElapsed((performance.now() - started.current) / 1000), 100)
+    return () => window.clearInterval(timer)
+  }, [busy])
+  useLedger(() => {
+    // One refresh for a settlement burst, rather than one HTTP request for each event.
+    if (refresh.current !== null) return
+    refresh.current = window.setTimeout(() => {
+      refresh.current = null
+      void load().catch((e: Error) => setError(e.message))
+    }, 250)
   })
-  const run = async () => { setBusy(true); setVerify(await api.get('/api/ledger/verify')); setBusy(false) }
+  const run = (full: boolean) => {
+    stream.current?.close(); setBusy(true); setVerify(null); setError(''); setElapsed(0)
+    started.current = performance.now()
+    const source = new EventSource(`/api/ledger/verify/stream${full ? '' : '?recent=200'}`)
+    stream.current = source
+    source.onmessage = (e) => {
+      try {
+        const result = JSON.parse(e.data) as Verification
+        setVerify(result)
+        if (result.done) { source.close(); setBusy(false); setElapsed((performance.now() - started.current) / 1000) }
+      } catch { source.close(); setBusy(false); setError('Verification returned an unreadable result. Please retry.') }
+    }
+    source.onerror = () => { source.close(); setBusy(false); setError('Verification connection interrupted. Please retry; no result has been certified.') }
+  }
   const shown = events.filter((e) => !filter || e.type.startsWith(filter))
   return (
     <main className="page">
       <div className="page-head">
         <div><h1>Ledger</h1><p className="lede">Every wish, tick, match and PayPal step is an event. Each one commits to the hash of the one before and carries Criée's Ed25519 signature, so any match can be replayed and checked.</p></div>
-        <button className="btn primary" onClick={run} disabled={busy}>{busy ? <Spinner /> : null} Verify the whole chain</button>
+        <div className="row wrap">
+          <button className="btn primary" onClick={() => run(false)} disabled={busy}>Quick check · latest 200</button>
+          <button className="btn" onClick={() => run(true)} disabled={busy}>Verify the whole chain</button>
+        </div>
       </div>
-      {verify && (
+      <p className="small muted">Quick check verifies up to 200 recent events against their signed predecessor. Full audit starts at genesis and verifies every event through a fixed snapshot of the head. The public event bodies below are redacted; verification runs over the original records on the server.</p>
+      {error && <div className="notice bad" role="alert" style={{ marginBottom: 18 }}>{error}</div>}
+      {busy && <div className="notice stack" role="status" aria-live="polite" style={{ marginBottom: 18 }}>
+        <div className="row"><Spinner /><b>{verify ? `${verify.checked.toLocaleString()} / ${verify.total.toLocaleString()} events checked` : 'Opening a ledger snapshot…'}</b><span className="mono small">{elapsed.toFixed(1)} s</span></div>
+        <progress className="verify-progress" max={verify?.total || 1} value={verify?.checked ?? 0} aria-label="Ledger verification progress" />
+        <span className="small muted">Recomputing SHA-256 links and verifying Ed25519 signatures. The market keeps running.</span>
+      </div>}
+      {verify?.done && (
         <div className={`notice ${verify.ok ? 'ok' : 'bad'} stack tight fade-in`} style={{ marginBottom: 18 }}>
-          <b>{verify.ok ? `Chain verified: ${verify.events} events, every link and signature checks out.` : `Broken at event ${verify.seq}: ${verify.reason}`}</b>
+          <b>{verify.ok ? `${verify.scope === 'full' ? 'Full chain verified' : 'Recent segment verified'}: ${verify.checked.toLocaleString()} events in ${elapsed.toFixed(2)} s.` : `Verification failed${verify.seq ? ` at event ${verify.seq}` : ''}: ${verify.reason}`}</b>
+          {verify.ok && <span className="small">Events #{verify.from_seq}–#{verify.to_seq} · {verify.scope === 'full' ? 'every link and signature from genesis checks out' : 'earlier history was not checked; use the full audit to verify from genesis'}.</span>}
           {verify.head && <span className="hash">head {verify.head}</span>}
           <details><summary className="small">Public key</summary><pre className="hash" style={{ whiteSpace: 'pre-wrap' }}>{verify.public_key}</pre></details>
         </div>

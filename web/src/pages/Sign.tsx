@@ -11,15 +11,19 @@ export default function Sign({ session }: { session: Session }) {
   const [error, setError] = useState('')
   const [signed, setSigned] = useState<Wish | null>(null)
   useEffect(() => {
-    api.get<Draft>(`/api/drafts/${draftId}`).then(setDraft).catch((e) => setError(e.message))
+    if (!session.account) return
+    let active = true
+    setError(''); setDraft(null)
+    api.get<Draft>(`/api/drafts/${draftId}`).then((d) => { if (active) setDraft(d) }).catch((e) => { if (active) setError(e.message) })
+    return () => { active = false }
   }, [draftId, session.account?.id])
   return (
     <main className="page narrow stack loose">
       <div className="page-head"><div><h1>Your agent drafted a wish</h1>
         <p className="lede">Nothing is bought until you sign. Read the sentence: it is generated from the exact terms your signature covers.</p></div></div>
       {error && <div className="notice bad">{error}</div>}
-      {!draft && !error && <Spinner />}
-      {!session.account && draft && <div className="notice warn">Open this link in the browser where you use Criée, so the wish is signed by you.</div>}
+      {!draft && !error && session.account && <Spinner />}
+      {!session.account && <div className="notice warn">Open this link in the browser where you use Criée, so the wish is signed by you.</div>}
       {draft && !signed && <DraftCard session={session} draft={draft} onSigned={setSigned} />}
       {signed && (
         <div className="card stack fade-in">

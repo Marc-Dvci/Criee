@@ -87,6 +87,8 @@ class LotState:
     closed: Optional[str] = None
     closed_at: Optional[datetime] = None
     committed: list[tuple[str, int]] = field(default_factory=list)   # (wish_id, units) in commit order
+    committed_at: dict[str, datetime] = field(default_factory=dict)
+    refill_after: Optional[datetime] = None
     reached: bool = False
     reached_at: Optional[datetime] = None
     last_price: Optional[int] = None
@@ -188,6 +190,7 @@ class Market:
         self.matches: dict[str, MatchState] = {}
         self.by_wish: dict[str, list[str]] = {}
         self.by_lot: dict[str, list[str]] = {}
+        self.pending_thresholds: dict[str, set[str]] = {}
         self.last_seq = 0
         self.revealed: dict[str, str] = {}
 
@@ -231,6 +234,7 @@ class Market:
         lot = self.lots.get(b["lot_id"])
         if lot and not lot.closed:
             lot.closed, lot.closed_at = "withdrawn", at
+            self._release_reservations(lot)
 
     def _on_clock_tick(self, b: dict, at: datetime, seq: int) -> None:
         lot = self.lots[b["lot_id"]]
@@ -268,6 +272,9 @@ class Market:
             lot = self.lots[m.fill.lot_id]
             if lot.terms.mode is ClearingMode.THRESHOLD:
                 lot.committed = [(w, u) for (w, u) in lot.committed if w != m.fill.wish_id]
+                lot.committed_at.pop(m.fill.wish_id, None)
+                self.pending_thresholds.get(m.fill.wish_id, set()).discard(lot.id)
+                lot.refill_after = at
 
     def _on_pickup_scanned(self, b: dict, at: datetime, seq: int) -> None:
         m = self.matches.get(b["match_id"])
@@ -300,15 +307,29 @@ class Market:
             m.status = MatchStatus.REFUNDED
 
     def _on_threshold_committed(self, b: dict, at: datetime, seq: int) -> None:
-        self.lots[b["lot_id"]].committed.append((b["wish_id"], b["units"]))
+        lot = self.lots[b["lot_id"]]
+        lot.committed.append((b["wish_id"], b["units"]))
+        lot.committed_at[b["wish_id"]] = at
+        if not lot.reached and not is_short_threshold(lot.terms):
+            self.pending_thresholds.setdefault(b["wish_id"], set()).add(lot.id)
+
+    def _release_reservations(self, lot: LotState) -> None:
+        for wid, _ in lot.committed:
+            reserved = self.pending_thresholds.get(wid)
+            if reserved is not None:
+                reserved.discard(lot.id)
+                if not reserved:
+                    self.pending_thresholds.pop(wid, None)
 
     def _on_threshold_reached(self, b: dict, at: datetime, seq: int) -> None:
         lot = self.lots[b["lot_id"]]
         lot.reached, lot.reached_at = True, at
+        self._release_reservations(lot)
 
     def _on_lot_closed(self, b: dict, at: datetime, seq: int) -> None:
         lot = self.lots[b["lot_id"]]
         lot.closed, lot.closed_at = b["reason"], at
+        self._release_reservations(lot)
         if b.get("seed"):
             self.revealed[lot.id] = b["seed"]
 
@@ -355,6 +376,18 @@ class Market:
         if any(self.matches[mid].fill.lot_id == lot.id for mid in self.by_wish.get(w.id, [])):
             return Skip.ALREADY_MATCHED
         n, spent = self.usage(w.id, at)
+        # A pending long group order reserves capacity until it clears or closes.
+        # Exclude this lot when converting its own reservation into a real match.
+        for lid in self.pending_thresholds.get(w.id, ()):
+            other = self.lots[lid]
+            if (other.id == lot.id or other.terms.mode is not ClearingMode.THRESHOLD
+                    or is_short_threshold(other.terms) or other.reached or other.closed
+                    or at >= other.terms.closes_at):
+                continue
+            committed_at = other.committed_at.get(w.id)
+            if committed_at is not None and committed_at <= at:
+                n += 1
+                spent += wt.units * other.terms.start_cents
         if n + 1 > wt.max_matches_per_week:
             return Skip.WEEK_COUNT
         if spent + wt.units * unit_cents > wt.budget_cents_per_week:
@@ -392,8 +425,9 @@ class Market:
                             when = max(w.signed_at, t.opens_at, lot.listed_at)
                             if when < t.closes_at and self.check(w, lot, when, t.start_cents) is None:
                                 out.append(Moment(when, 1, lot.seq, "commit", lot.id, w.id))
-                if lot.reached and self._threshold_short_of_fills(lot):
-                    out.append(Moment(lot.reached_at or t.opens_at, 4, lot.seq, "refill", lot.id))
+                refill_at = max(lot.reached_at or t.opens_at, lot.refill_after or t.opens_at)
+                if lot.reached and self._threshold_short_of_fills(lot, refill_at):
+                    out.append(Moment(refill_at, 4, lot.seq, "refill", lot.id))
                 out.append(Moment(t.closes_at, 5, lot.seq, "close", lot.id))
         for m in self.matches.values():
             if m.pickup_by is not None and m.status in (MatchStatus.PENDING, MatchStatus.HELD):
@@ -481,12 +515,18 @@ class Market:
         return {self.matches[mid].fill.wish_id for mid in self.by_lot.get(lot.id, [])
                 if self.matches[mid].status in LIVE}
 
-    def _threshold_short_of_fills(self, lot: LotState) -> bool:
+    def funded_units(self, lot: LotState) -> int:
+        """Units backed by successful holds or captures, including later refunded sales."""
+        return sum(self.matches[mid].fill.units for mid in self.by_lot.get(lot.id, [])
+                   if self.matches[mid].status in (MatchStatus.HELD, MatchStatus.CAPTURED, MatchStatus.REFUNDED))
+
+    def _threshold_short_of_fills(self, lot: LotState, at: datetime) -> bool:
         if lot.remaining <= 0:
             return False
         matched = {self.matches[mid].fill.wish_id for mid in self.by_lot.get(lot.id, [])}
-        return any(w not in matched and u <= lot.remaining for w, u in lot.committed
-                   if self.wishes[w].status == "active")
+        return any(w not in matched and u <= lot.remaining
+                   and self.check(self.wishes[w], lot, at, lot.terms.start_cents) is None
+                   for w, u in lot.committed)
 
     def _do_commit(self, mo: Moment) -> list:
         lot = self.lots[mo.ref]
@@ -495,8 +535,10 @@ class Market:
         order = len(lot.committed)
         evs: list = [("threshold.committed", {"lot_id": lot.id, "wish_id": w.id, "units": w.terms.units,
                                               "order": order}, mo.at)]
-        committed_units = sum(u for wid, u in lot.committed if self.wishes[wid].status == "active") + w.terms.units
         short = is_short_threshold(t)
+        committed_units = sum(u for wid, u in lot.committed
+                              if self.wishes[wid].status == "active"
+                              and (short or self.check(self.wishes[wid], lot, mo.at, t.start_cents) is None)) + w.terms.units
         if lot.reached or short:
             if w.terms.units <= lot.remaining:
                 evs.append(self._fill_event(lot, w, w.terms.units, t.start_cents, order, mo.at))
@@ -506,7 +548,7 @@ class Market:
             if not short:
                 left = lot.remaining
                 for i, (wid, units) in enumerate(lot.committed + [(w.id, w.terms.units)]):
-                    if units <= left and self.wishes[wid].status == "active":
+                    if units <= left and self.check(self.wishes[wid], lot, mo.at, t.start_cents) is None:
                         evs.append(self._fill_event(lot, self.wishes[wid], units, t.start_cents, i, mo.at))
                         left -= units
         return evs
@@ -519,7 +561,7 @@ class Market:
         matched = {self.matches[mid].fill.wish_id for mid in self.by_lot.get(lot.id, [])}
         for i, (wid, units) in enumerate(lot.committed):
             w = self.wishes[wid]
-            if wid in filled or wid in matched or w.status != "active" or units > left:
+            if wid in filled or wid in matched or units > left or self.check(w, lot, mo.at, lot.terms.start_cents) is not None:
                 continue
             evs.append(self._fill_event(lot, w, units, lot.terms.start_cents, i, mo.at))
             left -= units
@@ -531,7 +573,8 @@ class Market:
         lot = self.lots[mo.ref]
         t = lot.terms
         if t.mode is ClearingMode.THRESHOLD:
-            reason = "threshold_met" if lot.reached else "threshold_failed"
+            funded = self.funded_units(lot) >= (t.threshold_qty or t.quantity)
+            reason = "threshold_met" if lot.reached and funded else "threshold_failed"
         else:
             reason = "sold_out" if lot.remaining <= 0 else "deadline"
         return [("lot.closed", {"lot_id": lot.id, "reason": reason, "seed": self.seed(lot.id),

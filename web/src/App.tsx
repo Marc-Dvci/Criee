@@ -12,6 +12,7 @@ import Ledger from './pages/Ledger'
 import Play from './pages/Play'
 
 const Console = lazy(() => import('./pages/Console'))
+const Tour = lazy(() => import('./pages/Tour'))
 
 export type Session = { account: Account | null; status: Status | null; reload: () => Promise<void> }
 
@@ -34,6 +35,7 @@ function TopBar({ session }: { session: Session }) {
     <header className="topbar">
       <NavLink to="/" className="brand"><Mark /> Criée</NavLink>
       <nav className="nav" aria-label="Main">
+        <NavLink to="/tour">Tour</NavLink>
         <NavLink to="/wish">Wish</NavLink>
         <NavLink to="/sell">Sell</NavLink>
         <NavLink to="/board">Board</NavLink>
@@ -67,6 +69,7 @@ export default function App() {
           <Route path="/console" element={<Console session={session} />} />
           <Route path="/ledger" element={<Ledger />} />
           <Route path="/play" element={<Play session={session} />} />
+          <Route path="/tour" element={<Tour session={session} />} />
           <Route path="*" element={<Home session={session} />} />
         </Routes>
       </Suspense>

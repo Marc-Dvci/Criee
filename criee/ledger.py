@@ -105,7 +105,8 @@ class Ledger:
 
     @property
     def head(self) -> tuple[int, str]:
-        return self._head_seq, self._head
+        with self._lock:
+            return self._head_seq, self._head
 
     def append(self, type_: str, body: dict[str, Any], at: datetime) -> Event:
         body = json.loads(canonical(body))
@@ -149,17 +150,56 @@ class Ledger:
     def get(self, seq: int) -> Optional[Event]:
         return next(self.events(after=seq - 1, limit=1), None)
 
+    def verify_progress(self, recent: Optional[int] = None, batch_size: int = 256) -> Iterator[dict[str, Any]]:
+        """Verify a fixed head in bounded batches, without blocking appends during crypto work.
+
+        A recent check authenticates its predecessor as an anchor; it explicitly does not
+        certify the earlier history. Full verification always starts at genesis, with no cache.
+        """
+        if batch_size < 1 or (recent is not None and recent < 1):
+            raise ValueError("verification sizes must be positive")
+        target, target_hash = self.head
+        start = max(1, target - recent + 1) if recent is not None else 1
+        total = max(0, target - start + 1)
+        base = {"scope": "recent" if recent is not None else "full", "from_seq": start,
+                "to_seq": target, "total": total, "snapshot_head": target_hash}
+        n, cursor, prev = 0, start - 1, GENESIS
+        yield {**base, "done": False, "checked": 0}
+        if cursor:
+            anchor = self.get(cursor)
+            if anchor is None or anchor.seq != cursor or not self.signer.verify(anchor.hash, anchor.sig):
+                yield {**base, "done": True, "ok": False, "checked": 0, "seq": cursor, "reason": "bad anchor"}
+                return
+            prev = anchor.hash
+        while cursor < target:
+            batch = list(self.events(after=cursor, limit=min(batch_size, target - cursor)))
+            if not batch:
+                yield {**base, "done": True, "ok": False, "checked": n, "seq": cursor + 1, "reason": "missing event"}
+                return
+            for ev in batch:
+                reason = None
+                if ev.seq != cursor + 1:
+                    reason = "missing event"
+                elif ev.prev != prev:
+                    reason = "broken link"
+                elif event_hash(prev, ev.at, ev.type, ev.body) != ev.hash:
+                    reason = "hash mismatch"
+                elif not self.signer.verify(ev.hash, ev.sig):
+                    reason = "bad signature"
+                if reason:
+                    yield {**base, "done": True, "ok": False, "checked": n, "seq": ev.seq, "reason": reason}
+                    return
+                prev, cursor, n = ev.hash, ev.seq, n + 1
+            yield {**base, "done": False, "checked": n}
+        ok = prev == target_hash
+        yield {**base, "done": True, "ok": ok, "checked": n, "events": n, "head": prev,
+               **({"seq": target, "reason": "snapshot head mismatch"} if not ok else {})}
+
     def verify(self) -> dict[str, Any]:
-        prev, n = GENESIS, 0
-        for ev in self.events():
-            if ev.prev != prev:
-                return {"ok": False, "seq": ev.seq, "reason": "broken link"}
-            if event_hash(prev, ev.at, ev.type, ev.body) != ev.hash:
-                return {"ok": False, "seq": ev.seq, "reason": "hash mismatch"}
-            if not self.signer.verify(ev.hash, ev.sig):
-                return {"ok": False, "seq": ev.seq, "reason": "bad signature"}
-            prev, n = ev.hash, n + 1
-        return {"ok": True, "events": n, "head": prev}
+        for result in self.verify_progress():
+            if result["done"]:
+                return result
+        raise RuntimeError("verification did not finish")
 
     # Small private key-value store for server-side secrets (clock seeds before reveal, tokens).
     def kv_get(self, k: str) -> Optional[str]:

@@ -1,5 +1,8 @@
 # Criée
 
+[![CI](https://github.com/Marc-Dvci/Criee/actions/workflows/ci.yml/badge.svg)](https://github.com/Marc-Dvci/Criee/actions/workflows/ci.yml)
+[Threat model](docs/THREAT_MODEL.md) · [Review response and validation](docs/REVIEW_RESPONSE.md)
+
 **Criée is a clearing house for what small food sellers have left at closing.** People, or their own AI agents, leave standing wishes such as "an organic sourdough loaf twice a week, under €5, after six". Each wish is signed once with a passkey. At closing, a baker photographs the shelf and Criée lists what is left. A deterministic engine clears the two like a market, and PayPal settles each match the moment it clears. PayPal takes a hold on the buyer's saved wallet, captures it when the pickup code is scanned, and pays the seller through Payouts within the minute.
 
 Built for *Build What's Next with PayPal and AI*. Everything below runs on the PayPal sandbox.
@@ -10,19 +13,32 @@ Built for *Build What's Next with PayPal and AI*. Everything below runs on the P
 |---|---|
 | Hosted demo | https://marc-dvci.github.io/Criee/ (redirects to the live instance) |
 | Video (2:30) | https://youtu.be/8MBAmKqM3Bs |
-| One click to try | **Play both sides** on the home page: you become a buyer with a demo PayPal wallet and a seller with a stall |
+| Guided judge tour | [**Take the guided tour**](https://marc-dvci.github.io/Criee/?to=/tour): buyer → seller → pickup → payment proof; roles switch for you |
+| Free exploration | **Play both sides** creates a buyer with a demo wallet and a seller with a stall |
 | Local run | `docker compose up`, then http://localhost:8000. Runs with or without keys |
 | Measured on the hosted instance | 40 PayPal holds taken in **2.7 s** when a group order fills · one buyer-absent hold in **2.1 s** |
 
 ## Try it in two minutes
 
-1. Open the hosted demo and click **Play both sides**. Your account gets a demo PayPal wallet that is already saved, a stall on Place Kléber, and an open market of simulated bakeries, a traiteur and a farm's group order. Simulated actors are labelled on every screen. Their matches settle through the same PayPal sandbox path as yours.
+1. Open the hosted demo and click **Take the guided tour**, then **Start the guided tour**. Your account gets a demo PayPal wallet that is already saved, a stall on Place Kléber, and an open market of simulated bakeries, a traiteur and a farm's group order. The guide switches the visible buyer and seller surfaces for you. Steps are navigation; you explicitly sign wishes, publish lots and scan pickups. The step URL survives a reload. Simulated actors are labelled on every screen.
 2. **Wish.** Type *A 10 kg vegetable box from a local farm, up to €28*. Read the sentence back, then sign it with your passkey or with this browser's key. The farm's group order stands at 39 of 40. Your wish completes it, and Criée takes 40 PayPal holds in one burst and captures them. The board shows the burst time.
-3. **Sell.** On the Sell page, photograph any food with a price sign or label, or upload `data/samples/test_shelf.jpg`. Gemini lists the items and keeps a fact only when it can point to the label crop it read it from. Start a falling clock. Wish for that item from the Wish page, and watch your own wish buy it.
+3. **Sell.** Choose **Use the sample shelf photo**, or photograph food with a price sign or label. Gemini lists the items and keeps a fact only when it can point to the label crop it read it from. Start a falling clock. The next tour step returns you to the buyer to make a wish and find a pickup. This is a shared market: other eligible wishes can buy your stock too.
 4. **Collect.** Type the six-digit pickup code from the Wish page into the seller's keypad. The hold is captured, the pickup is attached to the PayPal order as tracking, and the payout to the seller appears in the console.
-5. **Check.** The Console shows every sale with its PayPal authorization and capture, refunds, payouts, disputes and the anonymised order book. The Ledger page verifies the whole signed hash chain in one click.
+5. **Check.** The Console shows your stall's sales with PayPal authorizations and captures, refunds, payouts, disputes and the anonymised order book. The tour also links directly to your captured group purchase's evidence PDF. On the Ledger page, **Quick check · latest 200** verifies recent links and signatures; **Verify the whole chain** audits from genesis with progress, elapsed time and the exact snapshot checked. A recent check does not certify older history.
 
-To save a real sandbox PayPal instead of the demo wallet, click **Save my PayPal (sandbox)** and log in with any sandbox personal account.
+To save your own sandbox wallet, use the official **PayPal JavaScript SDK v6** button in the buyer's PayPal section. It opens PayPal's actual approval screen and saves through Vault v3 without making a purchase. It remains available when the demo wallet is already saved. A direct PayPal approval fallback is also available. Use a sandbox personal account; the shared demo wallet needs no login. The offline double is labelled and does not load PayPal's hosted button.
+
+## PayPal products you can see and inspect
+
+| Product | Implemented behavior | Source |
+|---|---|---|
+| JavaScript SDK v6: Save PayPal | Official button, `VAULT_WITHOUT_PAYMENT` eligibility, `createPayPalSavePaymentSession`, approval callback | `web/src/PayPalSetup.tsx` |
+| Vault v3 | Setup token, PayPal approval, server-side payment token; browser sees only a restricted client token | `criee/api/app.py`, `criee/settlement/paypal.py` |
+| Orders v2 / Payments v2 | Buyer-absent authorization, pickup capture, void, refund and collection tracking | `criee/settlement/` |
+| Payouts / Disputes / Webhooks | Seller payouts, evidence submission and verified, deduplicated payment events | `criee/settlement/`, `criee/api/disputes.py`, `criee/api/webhooks.py` |
+| PayPal Agent Toolkit | Seller assistant's invoice and dispute tools | `criee/ai/assistant.py` |
+
+The v6 integration follows PayPal's [Save PayPal guide](https://developer.paypal.com/sdk/save-without-purchase/paypal/). Criée implements standing signed mandates and MCP delegation. PayPal's [Agent Ready](https://developer.paypal.com/agent-ready/overview/) and [Store Sync](https://docs.paypal.ai/growth/agentic-commerce/overview) are possible distribution integrations, **not implemented integrations or certifications**. No AP2, ACP or UCP compliance is claimed.
 
 ## How it works
 
@@ -133,7 +149,9 @@ Model access is server-side only. Live calls stop after a configured date, past 
 
 The ledger (`criee/ledger.py`) is append-only SQLite with triggers that refuse updates and deletes. Each event commits to the previous event's hash and carries an Ed25519 signature, and `/api/ledger/verify` re-checks the whole chain.
 
-`pytest` runs 58 tests: engine rules, invariants, settlement against an in-memory PayPal double, the HTTP API including MCP and signatures, the evidence PDF, the AI guardrails and the simulation.
+`pytest` exercises engine rules, generated invariants, settlement against an in-memory PayPal double, the HTTP API including MCP and signatures, the evidence PDF, AI guardrails and the simulation. Regression tests also cover agent/browser authority separation, wallet ownership, restricted SDK client-token issuance, ledger tampering, snapshot boundaries and public-event redaction.
+
+[GitHub Actions](.github/workflows/ci.yml) runs the backend suite on Python 3.12 and 3.13, builds the production TypeScript app with Node 24, then drives the judge journey in Chromium. CI needs no PayPal or Gemini secrets. The badge above reflects actual GitHub workflow results once the workflow is pushed; it is not a sandbox certification. See the [threat model](docs/THREAT_MODEL.md) for trust boundaries and limitations.
 
 ## Design
 
@@ -198,11 +216,13 @@ For development:
 uv venv --python 3.12 && uv pip install -e ".[dev]"
 uvicorn criee.api.app:create_app --factory --reload      # API on :8000
 cd web && npm ci && npm run dev                             # UI on :5173, proxied to the API
-pytest                                                      # 58 tests
+pytest                                                      # backend and property tests
+python -m playwright install chromium                        # one-time browser setup
+python scripts/judge_smoke.py                                # production UI journey; build web first
 python -m criee.sim --seeds 20 --out data/sim/results.json  # simulation
 ```
 
-The hosted instance runs the same image on AWS (Amazon Linux 2023, Graviton) behind a Cloudflare tunnel; `deploy/` holds the instance setup and the deploy script.
+The hosted instance runs the same image on AWS (Amazon Linux 2023, Graviton) behind a Cloudflare tunnel. The [deployment procedure](docs/DEPLOYMENT.md) builds before switching containers, backs up SQLite, preserves the signed ledger and saved wallets, and verifies the deployed revision with rollback on startup failure.
 
 ## What I built during the hackathon
 
@@ -210,7 +230,7 @@ All of it, between 1 October and 12 November 2026: the sandbox probe, the cleari
 
 ## Tools
 
-PayPal REST APIs (Vault v3, Orders v2, Payments v2, Payouts, Customer Disputes, Webhooks) and the PayPal Agent Toolkit for Python · Gemini 3.7 Flash (Gemini API) · AG Grid and AG Charts (Community) · FastAPI, Pydantic, SQLite · React, Vite, TypeScript · py_webauthn and WebAuthn · Model Context Protocol Python SDK · ReportLab · Hypothesis and pytest · Playwright · AWS EC2 · Cloudflare Tunnel.
+PayPal JavaScript SDK v6, PayPal REST APIs (Vault v3, Orders v2, Payments v2, Payouts, Customer Disputes, Webhooks) and the PayPal Agent Toolkit for Python · Gemini 3.7 Flash (Gemini API) · AG Grid and AG Charts (Community) · FastAPI, Pydantic, SQLite · React, Vite, TypeScript · py_webauthn and WebAuthn · Model Context Protocol Python SDK · ReportLab · Hypothesis and pytest · Playwright · GitHub Actions · AWS EC2 · Cloudflare Tunnel.
 
 ## License
 

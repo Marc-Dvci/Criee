@@ -189,6 +189,56 @@ def test_threshold_failed_hold_is_replaced_from_waitlist():
 
 # ----------------------------------------------------------------------------- ledger
 
+
+@pytest.mark.parametrize(("per_week", "budget"), [(1, 1800), (2, 1050)])
+def test_pending_group_commitment_reserves_weekly_count_and_budget(per_week, budget):
+    h = Harness()
+    buyer = h.wish(wish_terms(limit=350, units=3, per_week=per_week, budget=budget))
+    call = h.lot(lot_terms(ClearingMode.CALL, qty=3, start=300, floor=300, minutes=20))
+    group = h.lot(lot_terms(ClearingMode.THRESHOLD, qty=4, start=300, threshold=4, minutes=7 * 24 * 60))
+    h.run(T0)
+    assert h.market.is_committed(h.market.lots[group], buyer)
+    h.run(T0 + timedelta(minutes=20))
+    assert h.fills(call) == [], "an unfilled group commitment must not free the same spending authority"
+    h.wish(wish_terms(limit=350, per_week=1), at=T0 + timedelta(minutes=20))
+    h.run(T0 + timedelta(minutes=20))
+    assert h.market.lots[group].reached
+    assert len([f for f in h.fills() if f.wish_id == buyer]) == 1
+    assert h.market.usage(buyer, T0 + timedelta(minutes=20)) == (1, 900)
+
+
+def test_expired_group_commitment_cannot_count_toward_quorum_or_be_charged():
+    h = Harness()
+    group = h.lot(lot_terms(ClearingMode.THRESHOLD, qty=2, start=300, threshold=2, minutes=7 * 24 * 60))
+    expired = h.wish(wish_terms(limit=350, expires=T0 + timedelta(minutes=10)), at=T0)
+    h.run(T0)
+    h.wish(wish_terms(limit=350), at=T0 + timedelta(minutes=15))
+    h.run(T0 + timedelta(minutes=15))
+    assert not h.market.lots[group].reached and h.fills(group) == []
+    h.wish(wish_terms(limit=350), at=T0 + timedelta(minutes=16))
+    h.run(T0 + timedelta(minutes=16))
+    assert h.market.lots[group].reached
+    assert len(h.fills(group)) == 2 and all(f.wish_id != expired for f in h.fills(group))
+
+
+def test_group_refill_rechecks_a_waitlisted_wish_after_another_purchase():
+    h = Harness()
+    group = h.lot(lot_terms(ClearingMode.THRESHOLD, qty=2, start=300, threshold=2, minutes=7 * 24 * 60))
+    for i in range(3):
+        h.wish(wish_terms(limit=350, per_week=1), at=T0 + timedelta(seconds=i))
+    h.run(T0 + timedelta(minutes=1))
+    waiting = h.market.lots[group].committed[-1][0]
+    call = h.lot(lot_terms(ClearingMode.CALL, qty=1, start=300, floor=300, minutes=5))
+    h.run(T0 + timedelta(minutes=5))
+    assert [f.wish_id for f in h.fills(call)] == [waiting]
+    first = h.fills(group)[0]
+    h.emit("settlement.auth_failed", {"match_id": first.match_id}, T0 + timedelta(minutes=10))
+    h.run(T0 + timedelta(minutes=10))
+    assert len([f for f in h.fills() if f.wish_id == waiting]) == 1
+    replacement = h.wish(wish_terms(limit=350, per_week=1), at=T0 + timedelta(minutes=11))
+    h.run(T0 + timedelta(minutes=11))
+    assert any(f.wish_id == replacement for f in h.fills(group))
+
 def test_ledger_chain_verifies_and_detects_tampering():
     h = Harness()
     h.wish(wish_terms())

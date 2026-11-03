@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-asyncio>=0.24", "hypothesis>=6.100", "pypdf>=5", "matplotlib>=3.9", "numpy>=2"]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "hypothesis>=6.100", "pypdf>=5", "matplotlib>=3.9", "numpy>=2", "playwright>=1.56"]
 
 [build-system]
 requires = ["setuptools>=69"]

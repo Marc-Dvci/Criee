@@ -18,10 +18,17 @@ export default function Home({ session }: { session: Session }) {
           captures and pays out each match the moment it clears.
         </p>
         <div className="row wrap">
-          <Link to="/play" className="btn signal big">Play both sides</Link>
+          <Link to="/tour" className="btn signal big">Take the guided tour</Link>
+          <Link to="/play" className="btn big">Play both sides</Link>
           <Link to="/board" className="btn big">Watch the board</Link>
           {session.status && <span className="small muted">PayPal {session.status.paypal} · {session.status.ledger.events} signed ledger events</span>}
         </div>
+      </section>
+
+      <section className="proof-strip" aria-label="Measured engineering results">
+        <a href="https://github.com/Marc-Dvci/Criee/blob/main/data/settlement_timings.json" target="_blank" rel="noreferrer"><strong>40 holds · 2.63 s</strong><span>Measured PayPal sandbox burst · saved timings ↗</span></a>
+        <Link to="/ledger"><strong>Verify the money trail</strong><span>Quick signature check or full audit with progress →</span></Link>
+        <a href="https://github.com/Marc-Dvci/Criee/actions/workflows/ci.yml" target="_blank" rel="noreferrer"><strong>Inspect the engineering</strong><span>CI results, tests and source ↗</span></a>
       </section>
 
       <section className="card" style={{ marginTop: 34, padding: 0, overflow: 'hidden' }}>

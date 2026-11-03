@@ -23,6 +23,7 @@ class Action:
 
 def settlement_actions(market: Market, now: datetime) -> list[Action]:
     out: list[Action] = []
+    funded: dict[str, int] = {}
     for mid, m in sorted(market.matches.items()):
         lot = market.lots[m.fill.lot_id]
         mode = lot.terms.mode
@@ -33,7 +34,9 @@ def settlement_actions(market: Market, now: datetime) -> list[Action]:
             if dead:
                 out.append(Action("void", mid))
             elif mode is ClearingMode.THRESHOLD:
-                if lot.reached:
+                if lot.id not in funded:
+                    funded[lot.id] = market.funded_units(lot)
+                if lot.reached and funded[lot.id] >= (lot.terms.threshold_qty or lot.terms.quantity):
                     out.append(Action("capture", mid))
             elif m.scanned:
                 out.append(Action("capture", mid))

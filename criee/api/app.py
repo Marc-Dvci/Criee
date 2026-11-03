@@ -8,12 +8,13 @@ import logging
 import os
 import secrets
 from contextlib import asynccontextmanager
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -92,12 +93,19 @@ class RefundIn(BaseModel):
     reason: str = Field(default="", max_length=120)
 
 
+class VaultCompleteIn(BaseModel):
+    setup_token: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
+
+
 def visitor_of(request: Request) -> str:
     ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "?").split(",")[0]
     return hashlib.sha256(ip.encode()).hexdigest()[:16]
 
 
 def build_core(cfg: Config) -> Core:
+    if not cfg.paypal_live:
+        cfg = replace(cfg, demo_vault_id=cfg.demo_vault_id or "OFFLINE-DEMO",
+                      seller_payout_email=cfg.seller_payout_email or "offline-seller@example.test")
     paypal = PayPalClient(cfg.paypal_client_id, cfg.paypal_secret, cfg.currency) if cfg.paypal_live else FakePayPal()
     core = Core(cfg, paypal)
     core.ai = AI(cfg, core.ledger.kv_get, core.ledger.kv_set)
@@ -135,6 +143,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
     app = FastAPI(title="Criée", lifespan=lifespan, docs_url="/api/docs", openapi_url="/api/openapi.json")
     app.state.core = core
     secure = cfg.public_url.startswith("https://") or cfg.public_url == "auto"
+    demo_wallet_label = "Demo PayPal wallet (sandbox)" if cfg.paypal_live else "Demo wallet (offline double)"
 
     if cfg.public_url == "auto":
         @app.middleware("http")
@@ -165,7 +174,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
                        "calls_today": core.ai.budget.calls_today() if core.ai else 0, "daily_cap": cfg.ai_daily_cap,
                        "usd_today": round(core.ai.budget.usd_today(), 4) if core.ai else 0, "daily_usd": cfg.ai_daily_usd},
                 "ledger": {"events": core.ledger.head[0], "head": core.ledger.head[1]},
-                "fee_bps": cfg.fee_bps}
+                "fee_bps": cfg.fee_bps, "release": os.environ.get("CRIEE_RELEASE_SHA")}
 
     @app.get("/api/me")
     def get_me(request: Request) -> dict:
@@ -238,7 +247,11 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
 
     @app.get("/api/drafts/{did}")
     def get_draft(did: str, request: Request) -> dict:
-        return draft_out(load_draft(did), request, auth.current(request, core))
+        acc = me(request)
+        rec = load_draft(did)
+        if rec.get("account_id") not in (None, acc.id):
+            raise HTTPException(404, "no such draft")
+        return draft_out(rec, request, acc)
 
 
     @app.post("/api/drafts/{did}/sign")
@@ -291,6 +304,40 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
 
     # ------------------------------------------------------------------ buyer: PayPal vault
 
+    vault_lock = asyncio.Lock()
+
+    @app.get("/api/paypal/client-token")
+    async def paypal_client_token(request: Request) -> JSONResponse:
+        me(request)
+        if not cfg.paypal_live:
+            raise HTTPException(409, "PayPal's hosted button needs sandbox credentials. The offline demo still works.")
+        res = await core.paypal.browser_client_token()
+        if not res.ok:
+            raise HTTPException(502, f"PayPal: {res.issue()}")
+        return JSONResponse({"client_token": res.body["access_token"], "currency": cfg.currency},
+                            headers={"Cache-Control": "no-store"})
+
+    async def complete_vault(token: str, request: Request) -> None:
+        acc = me(request)
+        if core.ledger.kv_get(f"setup:{token}") != acc.id:
+            raise HTTPException(404, "no such setup token for this account")
+        async with vault_lock:
+            if core.ledger.kv_get(f"setup_done:{token}"):
+                return
+            res = await core.paypal.payment_token(token, token)
+            if not res.ok:
+                raise HTTPException(502, f"PayPal: {res.issue()}")
+            core.ledger.kv_set(f"vault:{acc.id}", res.body["id"])
+            core.ledger.kv_set(f"vault_label:{acc.id}", "PayPal (sandbox)")
+            core.emit("buyer.vaulted", {"account_id": acc.id, "method": "paypal_wallet",
+                                        "token_ref": hashlib.sha256(res.body["id"].encode()).hexdigest()[:12]})
+            core.ledger.kv_set(f"setup_done:{token}", "1")
+
+    @app.post("/api/vault/complete")
+    async def vault_complete(body: VaultCompleteIn, request: Request) -> dict:
+        await complete_vault(body.setup_token, request)
+        return {"ok": True}
+
     @app.post("/api/vault/start")
     async def vault_start(request: Request) -> dict:
         acc = me(request)
@@ -302,20 +349,12 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
             raise HTTPException(502, f"PayPal: {res.issue()}")
         core.ledger.kv_set(f"setup:{res.body['id']}", acc.id)
         approve = next((l["href"] for l in res.body.get("links", []) if l.get("rel") == "approve"), None)
-        return {"approve_url": approve, "setup_token": res.body["id"]}
+        return JSONResponse({"approve_url": approve, "setup_token": res.body["id"]},
+                            headers={"Cache-Control": "no-store"})
 
     @app.get("/api/vault/return")
     async def vault_return(approval_token_id: str, request: Request) -> RedirectResponse:
-        aid = core.ledger.kv_get(f"setup:{approval_token_id}")
-        if not aid:
-            raise HTTPException(404, "unknown setup token")
-        res = await core.paypal.payment_token(approval_token_id, approval_token_id)
-        if not res.ok:
-            return RedirectResponse(f"/wish?vault=failed&reason={res.issue()}")
-        core.ledger.kv_set(f"vault:{aid}", res.body["id"])
-        core.ledger.kv_set(f"vault_label:{aid}", "PayPal (sandbox)")
-        core.emit("buyer.vaulted", {"account_id": aid, "method": "paypal_wallet",
-                                    "token_ref": hashlib.sha256(res.body["id"].encode()).hexdigest()[:12]})
+        await complete_vault(approval_token_id, request)
         return RedirectResponse("/wish?vault=ok")
 
     @app.post("/api/vault/demo")
@@ -325,7 +364,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         if not demo:
             raise HTTPException(409, "no demo wallet configured")
         core.ledger.kv_set(f"vault:{acc.id}", "@demo")
-        core.ledger.kv_set(f"vault_label:{acc.id}", "Demo PayPal wallet (sandbox)")
+        core.ledger.kv_set(f"vault_label:{acc.id}", demo_wallet_label)
         core.emit("buyer.vaulted", {"account_id": acc.id, "method": "demo_wallet",
                                     "token_ref": hashlib.sha256(demo.encode()).hexdigest()[:12]})
         return {"ok": True}
@@ -578,23 +617,46 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
 
     def redact(ev) -> dict:
         d = ev.public()
+        if ev.type not in PUBLIC_TYPES:
+            return d | {"body": {"redacted": True}}
         b = dict(d["body"])
         for k in ("signature", "pickup_code", "debug_id", "listing"):
             if k in b:
                 b[k] = "…" if k != "listing" else {"name": (b[k] or {}).get("name")}
         if "terms" in b and ev.type == "wish.signed":
             b["terms"] = {"category": b["terms"]["category"], "limit_cents": b["terms"]["limit_cents"]}
+            for field in ("readback", "place", "buyer_id"):
+                b.pop(field, None)
         d["body"] = b
         return d
 
     @app.get("/api/ledger")
-    def ledger(after: int = 0, limit: int = 200) -> dict:
-        evs = [redact(e) for e in core.ledger.events(after=after, limit=min(limit, 1000))]
+    def ledger(after: int = Query(default=0, ge=0), limit: int = Query(default=200, ge=1, le=1000)) -> dict:
+        evs = [redact(e) for e in core.ledger.events(after=after, limit=limit)]
         return {"events": evs, "head": core.ledger.head}
 
     @app.get("/api/ledger/verify")
     def ledger_verify() -> dict:
         return core.ledger.verify() | {"public_key": core.ledger.signer.public_pem()}
+
+    @app.get("/api/ledger/verify/stream")
+    def ledger_verify_stream(recent: Optional[int] = Query(default=None, ge=1, le=1000)) -> StreamingResponse:
+        # A sync iterator is consumed in Starlette's thread pool; signatures never block the event loop.
+        def frames():
+            try:
+                for progress in core.ledger.verify_progress(recent=recent):
+                    if progress["done"]:
+                        progress["public_key"] = core.ledger.signer.public_pem()
+                    yield f"data: {json.dumps(progress)}\n\n"
+            except Exception:
+                log.exception("ledger verification failed")
+                yield 'data: {"done": true, "ok": false, "reason": "verification unavailable"}\n\n'
+        return StreamingResponse(frames(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"})
+
+    @app.get("/api/samples/shelf.jpg")
+    def sample_shelf() -> FileResponse:
+        return FileResponse(ROOT / "data" / "samples" / "test_shelf.jpg", media_type="image/jpeg")
 
     @app.get("/api/images/{name}")
     def image(name: str) -> FileResponse:
@@ -620,7 +682,7 @@ def create_app(cfg: Optional[Config] = None, core: Optional[Core] = None, start_
         if not acc.vaulted and (core.ledger.kv_get("vault:demo") or cfg.demo_vault_id):
             demo = core.ledger.kv_get("vault:demo") or cfg.demo_vault_id
             core.ledger.kv_set(f"vault:{acc.id}", "@demo")
-            core.ledger.kv_set(f"vault_label:{acc.id}", "Demo PayPal wallet (sandbox)")
+            core.ledger.kv_set(f"vault_label:{acc.id}", demo_wallet_label)
             core.emit("buyer.vaulted", {"account_id": acc.id, "method": "demo_wallet",
                                         "token_ref": hashlib.sha256(demo.encode()).hexdigest()[:12]})
         if not acc.shop:

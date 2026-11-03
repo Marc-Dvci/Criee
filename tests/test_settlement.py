@@ -123,9 +123,37 @@ def test_declined_hold_is_replaced_from_the_waitlist(tmp_path):
                        {"kind": "test"}, at=now - timedelta(minutes=50 - i))
     first = sorted(core.market.by_lot[lot])[0]
     core.paypal.decline.add(first)
+    asyncio.run(core.worker.step())
+    core.tick()
+    asyncio.run(core.worker.step())
+    assert not any(kind == "capture" for kind, _ in core.paypal.calls), "wait for the replacement hold before charging anyone"
     asyncio.run(_settle(core, 10))
     st = [core.market.matches[m].status for m in core.market.by_lot[lot]]
     assert st.count(MatchStatus.CAPTURED) == 5 and st.count(MatchStatus.FAILED) == 1
+
+
+def test_failed_group_funding_never_captures_the_other_buyers(core):
+    from criee.settlement.worker import SettlementWorker
+    core.worker = SettlementWorker(core)
+    farm = core.create_account("Ferme", ["seller"]).id
+    now = utcnow()
+    lot = core.list_lot(farm, lot_terms(ClearingMode.THRESHOLD, qty=5, start=2400, threshold=5,
+                                       minutes=10 * 24 * 60, category=Category.GROCERY_BOX,
+                                       opens=now - timedelta(hours=1)), LotListing(name="Colis"))
+    for i in range(5):
+        core.sign_wish(_buyer(core), wish_terms(limit=2500, category=Category.GROCERY_BOX,
+                                              expires=now + timedelta(days=20)),
+                       {"kind": "test"}, at=now - timedelta(minutes=50 - i))
+    core.paypal.decline.add(core.market.by_lot[lot][0])
+    asyncio.run(_settle(core, 5))
+    assert core.market.funded_units(core.market.lots[lot]) == 4
+    assert not any(kind == "capture" for kind, _ in core.paypal.calls)
+    core.tick(now + timedelta(days=11))
+    assert core.market.lots[lot].closed == "threshold_failed"
+    asyncio.run(_settle(core, 3))
+    assert all(core.market.matches[mid].status in (MatchStatus.FAILED, MatchStatus.VOIDED)
+               for mid in core.market.by_lot[lot])
+    assert not core.book.payouts and not any(kind == "capture" for kind, _ in core.paypal.calls)
 
 
 def test_refund_after_payout_is_netted_from_the_next_payout(core):

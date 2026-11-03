@@ -89,6 +89,13 @@ def test_seller_lot_clears_against_a_signed_wish_and_pays_out(client):
     sales = seller.get("/api/console").json()["sales"]
     assert len(sales) == 1 and sales[0]["status"] == "held"
     code = client.get("/api/matches").json()["matches"][0]["pickup_code"]
+    stranger = TestClient(client.app)
+    stranger.post("/api/session", json={"role": "seller"}).raise_for_status()
+    assert stranger.post("/api/pickups/scan", json={"code": code}).status_code == 404
+    sale_id = sales[0]["id"]
+    assert stranger.get(f"/api/evidence/{sale_id}.pdf").status_code == 403
+    assert stranger.post("/api/refunds", json={"match_id": sale_id, "cents": 1}).status_code == 404
+    assert stranger.get("/api/console").json()["sales"] == []
     seller.post("/api/pickups/scan", json={"code": code}).raise_for_status()
     _settle(core)
     con = seller.get("/api/console").json()
@@ -147,3 +154,88 @@ def test_ai_key_never_leaves_the_server(tmp_path):
     with TestClient(app) as c:
         assert "SECRET-KEY-123" not in c.get("/api/status").text
         assert "SECRET-KEY-123" not in c.get("/api/openapi.json").text
+
+
+def test_agent_bearer_cannot_register_a_signing_key_or_use_browser_authority(client):
+    _signed_wish(client)
+    token = client.post("/api/agent-token").json()["token"]
+    headers = {"authorization": f"Bearer {token}"}
+    # Even a caller holding a browser cookie cannot upgrade the bearer capability.
+    assert client.get("/api/me", headers=headers).json()["account"] is None
+    assert client.post("/api/devicekey/register", headers=headers, json={"jwk": Device().jwk}).status_code == 401
+    assert client.post("/api/vault/start", headers=headers).status_code == 401
+    assert client.post("/api/agent-token", headers=headers).status_code == 401
+
+
+def test_vault_approval_is_owned_by_session_and_completion_is_idempotent(client):
+    client.post("/api/session", json={"role": "buyer"}).raise_for_status()
+    start = client.post("/api/vault/start")
+    assert start.headers["cache-control"] == "no-store"
+    token = start.json()["setup_token"]
+    other = TestClient(client.app)
+    other.post("/api/session", json={"role": "buyer"}).raise_for_status()
+    body = {"setup_token": token}
+    assert other.post("/api/vault/complete", json=body).status_code == 404
+    assert other.get(f"/api/vault/return?approval_token_id={token}").status_code == 404
+    assert not other.get("/api/me").json()["account"]["vaulted"]
+    assert client.post("/api/vault/complete", json=body).json() == {"ok": True}
+    head = client.core.ledger.head
+    assert client.post("/api/vault/complete", json=body).json() == {"ok": True}
+    assert client.core.ledger.head == head
+    assert client.get("/api/me").json()["account"]["vault_label"] == "PayPal (sandbox)"
+
+
+def test_browser_client_token_never_returns_server_credentials(tmp_path):
+    from dataclasses import replace
+    cfg = replace(make_config(tmp_path), paypal_client_id="client", paypal_secret="PRIVATE-SECRET")
+    core = Core(cfg, FakePayPal())
+    with TestClient(create_app(cfg, core, start_loops=False)) as c:
+        assert c.get("/api/paypal/client-token").status_code == 401
+        c.post("/api/session", json={"role": "buyer"}).raise_for_status()
+        result = c.get("/api/paypal/client-token")
+        assert result.status_code == 200 and result.headers["cache-control"] == "no-store"
+        assert result.json() == {"client_token": "OFFLINE-CLIENT-TOKEN", "currency": "EUR"}
+        assert "PRIVATE-SECRET" not in result.text
+
+
+def test_ledger_stream_has_progress_scope_and_a_terminal_result(client):
+    client.post("/api/session", json={"role": "buyer"}).raise_for_status()
+    for i in range(8):
+        client.core.emit("test", {"i": i})
+    result = client.get("/api/ledger/verify/stream?recent=3")
+    frames = [json.loads(line[6:]) for line in result.text.splitlines() if line.startswith("data: ")]
+    assert result.headers["x-accel-buffering"] == "no"
+    assert frames[0]["checked"] == 0 and not frames[0]["done"]
+    assert frames[-1]["ok"] and frames[-1]["done"] and frames[-1]["events"] == 3
+    assert frames[-1]["scope"] == "recent" and "PUBLIC KEY" in frames[-1]["public_key"]
+    assert client.get("/api/ledger/verify/stream?recent=0").status_code == 422
+    assert client.get("/api/ledger/verify/stream?recent=1001").status_code == 422
+    assert client.get("/api/ledger?limit=-1").status_code == 422
+
+
+def test_public_ledger_hides_account_data_and_private_wish_details(client):
+    wish, *_ = _signed_wish(client)
+    events = client.get("/api/ledger?limit=1000").json()["events"]
+    account = next(e for e in events if e["type"] == "account.created")
+    assert account["body"] == {"redacted": True}
+    signed = next(e for e in events if e["type"] == "wish.signed")
+    assert "readback" not in signed["body"] and "place" not in signed["body"]
+    assert "buyer_id" not in signed["body"] and signed["body"]["signature"] == "…"
+    assert set(signed["body"]["terms"]) == {"category", "limit_cents"}
+    assert client.get("/api/ledger/verify").json()["ok"], "redaction must not alter the signed original"
+    other = TestClient(client.app)
+    other.post("/api/session", json={"role": "buyer"})
+    draft = client.post("/api/wishes/compile", json={"text": "a baguette under 2 euros", "lat": 48.58, "lon": 7.75}).json()
+    assert other.get(f"/api/drafts/{draft['id']}").status_code == 404
+
+
+def test_offline_play_works_without_any_keys_or_demo_wallet(tmp_path):
+    from dataclasses import replace
+    cfg = replace(make_config(tmp_path), demo_vault_id=None, seller_payout_email=None)
+    with TestClient(create_app(cfg, start_loops=False)) as c:
+        assert c.get("/api/status").json()["paypal"] == "offline double"
+        c.post("/api/play").raise_for_status()
+        account = c.get("/api/me").json()["account"]
+        assert account["vaulted"] and account["shop"] and set(account["roles"]) == {"buyer", "seller"}
+        assert c.get("/api/paypal/client-token").status_code == 409
+        assert c.get("/api/samples/shelf.jpg").content.startswith(b"\xff\xd8")

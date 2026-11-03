@@ -159,7 +159,21 @@ function ShelfTab({ onListed }: { onListed: () => void }) {
   const [result, setResult] = useState<ReadResult | null>(null)
   const [busy, setBusy] = useState(false)
   const mic = useRecorder()
-  const previews = files.map((f) => URL.createObjectURL(f))
+  const [previews, setPreviews] = useState<string[]>([])
+  useEffect(() => {
+    const urls = files.map((f) => URL.createObjectURL(f))
+    setPreviews(urls)
+    return () => urls.forEach((url) => URL.revokeObjectURL(url))
+  }, [files])
+  const sample = async () => {
+    setBusy(true)
+    try {
+      const res = await fetch('/api/samples/shelf.jpg')
+      if (!res.ok) throw new Error('Could not load the sample shelf.')
+      setFiles([new File([await res.blob()], 'test_shelf.jpg', { type: 'image/jpeg' })])
+    } catch (e: unknown) { toast((e as Error).message, true) }
+    finally { setBusy(false) }
+  }
   const read = async () => {
     setBusy(true)
     const fd = new FormData()
@@ -189,6 +203,7 @@ function ShelfTab({ onListed }: { onListed: () => void }) {
           <input type="file" accept="image/*" capture="environment" multiple hidden onChange={(e) => setFiles(Array.from(e.target.files ?? []).slice(0, 4))} />
           {files.length ? `Retake (${files.length} photo${files.length > 1 ? 's' : ''})` : 'Take photos'}
         </label>
+        <button className="btn" disabled={busy} onClick={sample}>Use the sample shelf photo</button>
         {previews.length > 0 && <div className="row wrap">{previews.map((p, i) => <img key={i} src={p} alt="" style={{ height: 84, borderRadius: 8, border: '1px solid var(--line)' }} />)}</div>}
         <div className="row between">
           {mic.recording
@@ -382,8 +397,8 @@ function AssistantTab() {
   )
 }
 
-export default function Seller({ session }: { session: Session }) {
-  const [tab, setTab] = useState<'shelf' | 'live' | 'demand' | 'assistant'>('shelf')
+export default function Seller({ session, initialTab = 'shelf' }: { session: Session; initialTab?: 'shelf' | 'live' | 'demand' | 'assistant' }) {
+  const [tab, setTab] = useState<'shelf' | 'live' | 'demand' | 'assistant'>(initialTab)
   const start = async () => { await api.post('/api/session', { role: 'seller' }); await session.reload() }
   if (!session.account) {
     return (

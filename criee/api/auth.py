@@ -46,9 +46,9 @@ def current(request: Request, core: Core) -> Optional[Account]:
     raw = request.cookies.get(COOKIE) or ""
     auth = request.headers.get("authorization", "")
     if auth.lower().startswith("bearer "):
-        token = auth[7:].strip()
-        aid = core.ledger.kv_get(f"agent_token:{hashlib.sha256(token.encode()).hexdigest()}")
-        return core.accounts.get(aid) if aid else None
+        # Agent tokens are scoped to the MCP mount, which authenticates them separately.
+        # Accepting one here would let an agent register its own device key and sign wishes.
+        return None
     if "." not in raw:
         return None
     aid, mac = raw.rsplit(".", 1)

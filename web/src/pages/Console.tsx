@@ -167,7 +167,7 @@ export default function Console({ session }: { session: Session }) {
         <div><h1>{session.account!.shop!.name} · console</h1><p className="lede">Every sale with its PayPal authorization and capture, every payout and dispute, and the demand around the shop.</p></div>
         <input className="input" style={{ maxWidth: 280 }} placeholder="Search" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search the table" />
       </div>
-      <div className="grid-3" style={{ gridTemplateColumns: 'repeat(5, minmax(0,1fr))', marginBottom: 18 }}>
+      <div className="grid-3 summary-tiles" style={{ marginBottom: 18 }}>
         <Tile label="Captured" value={eur(captured)} hint={`${s.filter((m) => m.status === 'captured').length} sales`} />
         <Tile label="Holds open" value={eur(held.reduce((a, m) => a + m.total, 0))} hint={`${held.length} awaiting pickup`} />
         <Tile label="Paid out" value={eur(net)} hint={`after the ${((data?.fee_bps ?? 400) / 100).toFixed(0)}% fee`} />

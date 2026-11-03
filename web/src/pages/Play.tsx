@@ -17,6 +17,7 @@ export default function Play({ session }: { session: Session }) {
     <main className="page narrow stack loose">
       <div className="page-head"><div><h1>Play both sides</h1>
         <p className="lede">Be the buyer and the baker in the same browser. Your wishes clear against your own lots and a simulated Strasbourg market, and every hold, capture and payout runs on the PayPal sandbox.</p></div></div>
+      <Link className="btn signal big" to="/tour">Take the guided tour · roles switch for you →</Link>
       {!ready ? (
         <div className="card stack">
           <p style={{ margin: 0 }}>One click creates your account with a demo PayPal wallet already saved, a stall on Place Kléber, and an open market of bakeries, a traiteur and a farm's group order.</p>
@@ -27,7 +28,7 @@ export default function Play({ session }: { session: Session }) {
           <div className="card stack">
             <span className="upper muted">Step 1 · buyer</span>
             <h2>Make a wish</h2>
-            <p className="small muted" style={{ margin: 0 }}>Type what you would buy and your price. Read the sentence back and sign it. Try: "a 10 kg vegetable box from a local farm, up to €28": the farm's group order is three commitments short.</p>
+            <p className="small muted" style={{ margin: 0 }}>Type what you would buy and your price. Read the sentence back and sign it. Try: "a 10 kg vegetable box from a local farm, up to €28". The live board shows how many commitments the farm's group order still needs.</p>
             <Link className="btn primary" to="/wish" style={{ alignSelf: 'flex-start' }}>Open the buyer app</Link>
           </div>
           <div className="card stack">

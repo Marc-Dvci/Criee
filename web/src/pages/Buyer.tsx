@@ -5,6 +5,7 @@ import { ATTR, CATEGORY, MODE, NEIGHBOURHOODS, api, eur, hhmm, type Draft, type 
 import { MatchTimeline, Section, Spinner, StatusChip } from '../components'
 import { toast, useLive } from '../hooks'
 import { deviceSign, passkeySign, passkeysAvailable, registerPasskey } from '../signing'
+import PayPalSetup from '../PayPalSetup'
 
 const EXAMPLES = [
   'An organic sourdough loaf twice a week, under €5, after 18:00 on weekdays',
@@ -44,42 +45,8 @@ export async function signDraft(session: Session, draft: Draft, method: 'passkey
   return api.post<Wish>(`/api/drafts/${draft.id}/sign`, { kind: 'passkey', assertion })
 }
 
-function PayPalSetup({ session }: { session: Session }) {
-  const acc = session.account!
-  const [busy, setBusy] = useState('')
-  if (acc.vaulted) {
-    return (
-      <div className="row between wrap">
-        <div className="row"><span className="dot" /><span><b>{acc.vault_label ?? 'PayPal saved'}</b> <span className="muted small">· charged only when a match clears, inside what you signed</span></span></div>
-      </div>
-    )
-  }
-  const start = async () => {
-    setBusy('paypal')
-    try {
-      const r = await api.post<{ approve_url: string }>('/api/vault/start')
-      window.location.href = r.approve_url
-    } catch (e: any) { toast(e.message, true); setBusy('') }
-  }
-  const demo = async () => {
-    setBusy('demo')
-    try { await api.post('/api/vault/demo'); await session.reload(); toast('Demo PayPal wallet saved') } catch (e: any) { toast(e.message, true) }
-    setBusy('')
-  }
-  return (
-    <div className="stack">
-      <div><b>Save PayPal once.</b> <span className="muted">Criée takes a hold only when a match clears, within the limits you sign.</span></div>
-      <div className="row wrap">
-        <button className="btn primary" onClick={start} disabled={!!busy}>{busy === 'paypal' ? <Spinner /> : null} Save my PayPal (sandbox)</button>
-        <button className="btn" onClick={demo} disabled={!!busy}>Use the demo wallet</button>
-      </div>
-      <div className="small faint">Save my PayPal opens the PayPal sandbox: log in with any sandbox personal account.</div>
-    </div>
-  )
-}
-
-function Composer({ onDraft }: { onDraft: (d: Draft) => void }) {
-  const [text, setText] = useState('')
+function Composer({ onDraft, initialText = '' }: { onDraft: (d: Draft) => void; initialText?: string }) {
+  const [text, setText] = useState(initialText)
   const [place, setPlace] = useState(NEIGHBOURHOODS[1])
   const [busy, setBusy] = useState(false)
   const [questions, setQuestions] = useState<string[]>([])
@@ -232,7 +199,7 @@ function AgentPanel() {
   )
 }
 
-export default function Buyer({ session }: { session: Session }) {
+export default function Buyer({ session, initialText = '' }: { session: Session; initialText?: string }) {
   const [params, setParams] = useSearchParams()
   const [draft, setDraft] = useState<Draft | null>(null)
   const { data, reload } = useLive<{ wishes: Wish[] }>(session.account ? '/api/wishes' : null)
@@ -240,6 +207,7 @@ export default function Buyer({ session }: { session: Session }) {
     const v = params.get('vault')
     if (v === 'ok') { toast('PayPal saved for future matches'); session.reload() }
     if (v === 'failed') toast(`PayPal did not save: ${params.get('reason') ?? ''}`, true)
+    if (v === 'cancel') toast('PayPal approval cancelled. Your current wallet is still available.')
     if (v) { params.delete('vault'); setParams(params, { replace: true }) }
   }, [])
   const start = async () => { await api.post('/api/session', { role: 'buyer' }); await session.reload() }
@@ -256,7 +224,7 @@ export default function Buyer({ session }: { session: Session }) {
       <div className="page-head"><div><h1>Your standing wishes</h1><p className="lede">Each one is a limit order you sign once. Criée buys only inside it, and PayPal settles at pickup.</p></div></div>
       <Section title="PayPal"><PayPalSetup session={session} /></Section>
       {draft ? <DraftCard session={session} draft={draft} onSigned={() => { setDraft(null); reload() }} onEdit={() => setDraft(null)} />
-        : <Section title="New wish"><Composer onDraft={setDraft} /></Section>}
+        : <Section title="New wish"><Composer onDraft={setDraft} initialText={initialText} /></Section>}
       <div className="stack">
         {(data?.wishes ?? []).map((w) => <WishCard key={w.id} w={w} reload={reload} />)}
         {data && data.wishes.length === 0 && !draft && <div className="empty">No wish yet. Describe one above.</div>}

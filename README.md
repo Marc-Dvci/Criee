@@ -24,7 +24,7 @@ Built for *Build What's Next with PayPal and AI*. Everything below runs on the P
 | Local run | `docker compose up`, then http://localhost:8000. Runs with or without keys |
 | Measured on the hosted instance | 40 PayPal holds taken in **2.7 s** when a group order fills · one buyer-absent hold in **2.1 s** |
 
-[For judges](#for-judges) · [Try it](#try-it-in-two-minutes) · [How it works](#how-it-works) ·
+[For judges](#for-judges) · [See it work](#see-it-work) · [Try it](#try-it-in-two-minutes) · [How it works](#how-it-works) ·
 [PayPal end to end](#paypal-end-to-end) · [AI](#ai) · [Design](#design) · [Impact](#potential-impact) ·
 [Innovation](#innovation) · [Claims](#claims-and-where-to-check-them) · [Run it](#run-it-locally)
 
@@ -37,6 +37,18 @@ Built for *Build What's Next with PayPal and AI*. Everything below runs on the P
 | **Potential Impact** | [Potential impact](#potential-impact): food waste at closing, and a simulated week of 12 bakeries and 10,000 residents |
 | **Innovation/Idea** | [Innovation](#innovation): an intent mandate cleared as a limit order, a PayPal hold as an assurance contract, evidence-grounded listings, disputes answered from the ledger |
 | **Presentation** | [The film (2:28)](https://www.youtube.com/watch?v=HCf7Bmuz790), and the [guided tour](https://marc-dvci.github.io/Criee/?to=/tour) on the live instance |
+
+## See it work
+
+![The departures board: a falling-clock price steps down every five seconds while wishes wait](docs/gif/board.gif)
+
+<p align="center">
+  <img src="docs/gif/wish.gif" width="500" alt="A wish typed in plain words is read back as the exact terms the buyer signs">
+  <img src="docs/gif/shelf.gif" width="330" alt="The seller uses a shelf photo, and the four items found are boxed on it">
+</p>
+
+*Recorded on a local run with no keys: PayPal is the offline double and Gemini's answers are replayed, as the app labels
+them.*
 
 ## Try it in two minutes
 

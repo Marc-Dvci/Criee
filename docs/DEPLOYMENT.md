@@ -2,7 +2,7 @@
 
 Run the test suite, build the web app and run `scripts/judge_smoke.py` before committing. Fetch and retain upstream changes, then push the reviewed commit. GitHub Actions checks Python 3.12/3.13 and the production Chromium journey.
 
-From a clean checkout, run `bash deploy/deploy.sh 32.198.10.126`. On Windows, use Git Bash. The script needs the existing SSH key (`~/.ssh/criee.pem`, overridable with `CRIEE_SSH_KEY`) and the server's existing `/opt/criee/criee.env`. It does not transfer credentials or replace that environment file.
+From a clean checkout, run `bash deploy/deploy.sh <host>` with the server's address. On Windows, use Git Bash. The script needs the existing SSH key (`~/.ssh/criee.pem`, overridable with `CRIEE_SSH_KEY`) and the server's existing `/opt/criee/criee.env`. It does not transfer credentials or replace that environment file.
 
 The release script packages exactly `git archive HEAD` plus a fresh `web/dist`, builds an image tagged and labelled with the commit, and leaves the current container running until the build succeeds. Source stays under `/opt/criee/releases/<commit>`.
 

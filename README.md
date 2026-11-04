@@ -1,22 +1,42 @@
 # Criée
 
 [![CI](https://github.com/Marc-Dvci/Criee/actions/workflows/ci.yml/badge.svg)](https://github.com/Marc-Dvci/Criee/actions/workflows/ci.yml)
-[Threat model](docs/THREAT_MODEL.md) · [Review response and validation](docs/REVIEW_RESPONSE.md)
+[![Clearing core coverage: 96%](https://img.shields.io/badge/clearing%20core%20coverage-96%25-brightgreen)](#the-engine-and-its-invariants)
+[![CodeQL](https://github.com/Marc-Dvci/Criee/actions/workflows/codeql.yml/badge.svg)](https://github.com/Marc-Dvci/Criee/actions/workflows/codeql.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![Live demo](https://img.shields.io/badge/live-demo-d4a017)](https://marc-dvci.github.io/Criee/)
+[![Guided tour](https://img.shields.io/badge/guided-tour-d4a017)](https://marc-dvci.github.io/Criee/?to=/tour)
+
+[![Watch the film: Criée, the market that finds you](docs/figures/film_thumbnail.jpg)](https://www.youtube.com/watch?v=HCf7Bmuz790)
+
+**[Watch the film (2:28)](https://www.youtube.com/watch?v=HCf7Bmuz790)**: the market working end to end on the PayPal sandbox.
 
 **Criée is a clearing house for what small food sellers have left at closing.** People, or their own AI agents, leave standing wishes such as "an organic sourdough loaf twice a week, under €5, after six". Each wish is signed once with a passkey. At closing, a baker photographs the shelf and Criée lists what is left. A deterministic engine clears the two like a market, and PayPal settles each match the moment it clears. PayPal takes a hold on the buyer's saved wallet, captures it when the pickup code is scanned, and pays the seller through Payouts within the minute.
 
 Built for *Build What's Next with PayPal and AI*. Everything below runs on the PayPal sandbox.
 
-![The departures board of the city's leftovers](docs/figures/board.png)
-
 | | |
 |---|---|
 | Hosted demo | https://marc-dvci.github.io/Criee/ (redirects to the live instance) |
-| Video (2:28) | https://youtu.be/HCf7Bmuz790 |
+| Video (2:28) | https://www.youtube.com/watch?v=HCf7Bmuz790 |
 | Guided judge tour | [**Take the guided tour**](https://marc-dvci.github.io/Criee/?to=/tour): buyer → seller → pickup → payment proof; roles switch for you |
 | Free exploration | **Play both sides** creates a buyer with a demo wallet and a seller with a stall |
 | Local run | `docker compose up`, then http://localhost:8000. Runs with or without keys |
 | Measured on the hosted instance | 40 PayPal holds taken in **2.7 s** when a group order fills · one buyer-absent hold in **2.1 s** |
+
+[For judges](#for-judges) · [Try it](#try-it-in-two-minutes) · [How it works](#how-it-works) ·
+[PayPal end to end](#paypal-end-to-end) · [AI](#ai) · [Design](#design) · [Impact](#potential-impact) ·
+[Innovation](#innovation) · [Claims](#claims-and-where-to-check-them) · [Run it](#run-it-locally)
+
+## For judges
+
+| Criterion | Where it is answered |
+|---|---|
+| **Technological Implementation** | [PayPal products you can inspect](#paypal-products-you-can-see-and-inspect) and [PayPal, end to end](#paypal-end-to-end): Vault v3, Orders and Payments v2, Payouts, Disputes, Webhooks, the JavaScript SDK v6 and the Agent Toolkit, each with its source file; [AI](#ai): Gemini behind guardrails in code; [the engine and its invariants](#the-engine-and-its-invariants): 82 tests, 96% coverage of the clearing core |
+| **Design** | [Design](#design): the buyer, the phone-first seller, the board, the console and the ledger; the [guided tour](https://marc-dvci.github.io/Criee/?to=/tour) walks all of them |
+| **Potential Impact** | [Potential impact](#potential-impact): food waste at closing, and a simulated week of 12 bakeries and 10,000 residents |
+| **Innovation/Idea** | [Innovation](#innovation): an intent mandate cleared as a limit order, a PayPal hold as an assurance contract, evidence-grounded listings, disputes answered from the ledger |
+| **Presentation** | [The film (2:28)](https://www.youtube.com/watch?v=HCf7Bmuz790), and the [guided tour](https://marc-dvci.github.io/Criee/?to=/tour) on the live instance |
 
 ## Try it in two minutes
 
@@ -42,41 +62,10 @@ The v6 integration follows PayPal's [Save PayPal guide](https://developer.paypal
 
 ## How it works
 
-```mermaid
-flowchart LR
-  subgraph People
-    B[Buyer app<br/>chat + passkey]
-    A[Any AI agent<br/>over MCP]
-    S[Seller phone app<br/>photo + voice]
-  end
-  subgraph AI["Gemini 3.7 Flash (proposes, never decides)"]
-    WC[Wish compiler]
-    SR[Shelf reader]
-    ADV[Advice writer]
-    AS[Seller assistant]
-  end
-  subgraph Core["Deterministic core"]
-    ENG[Clearing engine<br/>call · clock · threshold]
-    LED[(Signed hash-chained ledger)]
-    SET[Settlement worker]
-  end
-  subgraph PayPal["PayPal sandbox"]
-    V[Vault v3]
-    O[Orders v2 + Payments v2]
-    P[Payouts]
-    D[Disputes + Webhooks]
-    T[Agent Toolkit: invoices, disputes]
-  end
-  B --> WC --> ENG
-  A --> WC
-  S --> SR --> ENG
-  ENG <--> LED
-  LED --> SET --> O & P
-  B --> V
-  D --> SET
-  AS --> T
-  ADV --> S
-```
+![Criée in four bands: people's apps and any AI agent; Gemini, which proposes and never decides; the deterministic core, which clears, records and settles; and the PayPal sandbox](docs/figures/architecture.png)
+
+*Gemini turns words, shelf photos and voice notes into typed terms; only the deterministic core decides. Drawn by
+`scripts/architecture_figure.py`.*
 
 **A wish is a limit order.** It names a category, conditions such as organic or gluten-free, a price ceiling, units, a weekly cap and budget, a pickup area and hours, the clearing modes it accepts, and an expiry. The person signs the SHA-256 of its canonical JSON with a passkey (WebAuthn, the digest is the challenge), so the stored assertion proves consent to those exact terms.
 
@@ -151,13 +140,17 @@ The ledger (`criee/ledger.py`) is append-only SQLite with triggers that refuse u
 
 `pytest` exercises engine rules, generated invariants, settlement against an in-memory PayPal double, the HTTP API including MCP and signatures, the evidence PDF, AI guardrails and the simulation. Regression tests also cover agent/browser authority separation, wallet ownership, restricted SDK client-token issuance, ledger tampering, snapshot boundaries and public-event redaction.
 
-[GitHub Actions](.github/workflows/ci.yml) runs the backend suite on Python 3.12 and 3.13, builds the production TypeScript app with Node 24, then drives the judge journey in Chromium. CI needs no PayPal or Gemini secrets. The badge above reflects actual GitHub workflow results once the workflow is pushed; it is not a sandbox certification. See the [threat model](docs/THREAT_MODEL.md) for trust boundaries and limitations.
+The 82 tests cover 96% of the clearing core (`engine.py`, `ledger.py`, `domain.py`, `canonical.py`, `evidence.py` and the settlement policy), and CI fails below 90%.
+
+[GitHub Actions](.github/workflows/ci.yml) runs the backend suite on Python 3.12 and 3.13, builds the production TypeScript app with Node 24, then drives the judge journey in Chromium. CI needs no PayPal or Gemini secrets. See the [threat model](docs/THREAT_MODEL.md) for trust boundaries and limitations.
 
 Audit progress uses bounded background jobs and short JSON polls, so it remains visible through the demo's Cloudflare Quick Tunnel. That host uses regular market refreshes because Quick Tunnels buffer SSE; direct event streams remain available for supported hosts and clients. Release verification checks that the progress bar advances before the audit finishes.
 
 ## Design
 
 Three surfaces share one design language: the fish-auction hall and the station departures board. Dark slate, chalk white, and one amber signal for "sold".
+
+![The departures board of the city's leftovers](docs/figures/board.png)
 
 - **Buyer** (`/wish`): describe a wish, read it back, sign. Each wish shows its weekly use, what it is watching and why open lots did not match ("a fact you asked for is not shown on the label"), group-order commitments with their progress, and pickup codes.
 - **Seller**, built phone-first (`/sell`): photograph the shelf, see each item boxed on the photo with the label crops behind its facts, pick a clearing mode, watch the split-flap price, type pickup codes on a keypad, read the demand curve, and talk to the assistant.
@@ -219,7 +212,7 @@ uv venv --python 3.12 && uv pip install -e ".[dev]"
 uv pip install --no-deps -r requirements-toolkit.txt         # PayPal's shared API/schema core
 uvicorn criee.api.app:create_app --factory --reload      # API on :8000
 cd web && npm ci && npm run dev                             # UI on :5173, proxied to the API
-pytest                                                      # backend and property tests
+pytest --cov                                                # 82 tests; 96% of the clearing core
 python -m playwright install chromium                        # one-time browser setup
 python scripts/judge_smoke.py                                # production UI journey; build web first
 python -m criee.sim --seeds 20 --out data/sim/results.json  # simulation

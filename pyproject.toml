@@ -25,7 +25,7 @@ dependencies = [
 # pins unused agent-framework adapters. See requirements-toolkit.txt and README.md.
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-asyncio>=0.24", "hypothesis>=6.100", "pypdf>=5", "matplotlib>=3.9", "numpy>=2", "playwright>=1.56"]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "pytest-cov>=7", "hypothesis>=6.100", "pypdf>=5", "matplotlib>=3.9", "numpy>=2", "playwright>=1.56"]
 
 [build-system]
 requires = ["setuptools>=69"]
@@ -33,3 +33,20 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["criee*"]
+
+[tool.coverage.run]
+source = ["criee"]
+
+[tool.coverage.report]
+# The clearing core: the engine that decides every match, the signed ledger, the typed domain and its canonical
+# encoding, the dispute evidence and the settlement policy.
+include = [
+  "*/criee/engine.py",
+  "*/criee/ledger.py",
+  "*/criee/domain.py",
+  "*/criee/canonical.py",
+  "*/criee/evidence.py",
+  "*/criee/settlement/policy.py",
+]
+fail_under = 90
+show_missing = true

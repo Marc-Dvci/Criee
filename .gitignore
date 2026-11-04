@@ -10,3 +10,4 @@ web/dist/
 var/
 bundle.tar*
 deploy/.criee.env
+.coverage
